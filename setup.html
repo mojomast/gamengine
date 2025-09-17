@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Poker Doom Project</title>
+    <link rel="stylesheet" href="./shared/styles.css">
+</head>
+<body>
+    <!-- Skip Links for Screen Readers -->
+    <a href="#main-content" class="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded">Skip to main content</a>
+
+    <main id="main-content" class="container mx-auto px-4 py-8">
+        <header role="banner">
+            <h1 class="text-2xl font-bold mb-4">Setting up Poker Doom Project...</h1>
+        </header>
+
+        <section aria-labelledby="setup-instructions">
+            <h2 id="setup-instructions" class="sr-only">Setup Instructions</h2>
+            <p class="mb-4">Open this file in a browser to add the project to localStorage.</p>
+        </section>
+
+        <section aria-labelledby="setup-status" aria-live="polite" aria-atomic="true">
+            <h2 id="setup-status" class="sr-only">Setup Status</h2>
+            <div id="status" role="status"></div>
+        </section>
+    </main>
+
+    <!-- Screen Reader Announcements -->
+    <div id="sr-announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+    <div id="sr-status" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
+
+    <script>
+        // Screen reader announcement function
+        function announceToScreenReader(message, priority = 'polite') {
+            const target = priority === 'assertive' ? 'sr-status' : 'sr-announcements';
+            const announcer = document.getElementById(target);
+            if (announcer) {
+                announcer.textContent = message;
+                if (priority === 'assertive') {
+                    setTimeout(() => { announcer.textContent = ''; }, 1000);
+                }
+            }
+        }
+
+        // Initialize accessibility features
+        function initializeAccessibility() {
+            // Announce page load
+            setTimeout(() => {
+                announceToScreenReader('Setup page loaded. Beginning project setup automatically.');
+            }, 500);
+
+            // High contrast mode support
+            const highContrast = window.matchMedia('(prefers-contrast: high)').matches;
+            if (highContrast) {
+                document.body.classList.add('high-contrast');
+            }
+
+            // Reduced motion support
+            const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (reducedMotion) {
+                document.body.classList.add('reduced-motion');
+            }
+        }
+
+        async function setupProject() {
+            try {
+                announceToScreenReader('Loading project configuration...', 'assertive');
+
+                const response = await fetch('./poker-doom-project/project.json');
+                if (!response.ok) {
+                    throw new Error('Failed to load project.json');
+                }
+                const project = await response.json();
+
+                announceToScreenReader('Project configuration loaded. Checking existing projects...', 'assertive');
+
+                // Get existing projects from localStorage
+                let projects = [];
+                const existing = localStorage.getItem('gameEngineProjects');
+                if (existing) {
+                    try {
+                        projects = JSON.parse(existing);
+                        if (!Array.isArray(projects)) {
+                            projects = [];
+                        }
+                    } catch (e) {
+                        projects = [];
+                    }
+                }
+
+                // Check if project already exists
+                const existingIndex = projects.findIndex(p => p.id === project.id);
+                const isUpdate = existingIndex >= 0;
+
+                if (isUpdate) {
+                    projects[existingIndex] = project;
+                    announceToScreenReader('Updating existing project in localStorage...', 'assertive');
+                } else {
+                    projects.push(project);
+                    announceToScreenReader('Adding new project to localStorage...', 'assertive');
+                }
+
+                // Save back to localStorage
+                localStorage.setItem('gameEngineProjects', JSON.stringify(projects));
+
+                const statusMessage = isUpdate ?
+                    'Project updated successfully in localStorage!' :
+                    'Project added successfully to localStorage!';
+                document.getElementById('status').innerHTML = '<p style="color: green;">✅ ' + statusMessage + '</p><p>You can now open the Project Manager to load this project.</p>';
+
+                announceToScreenReader(statusMessage + ' You can now open the Project Manager to load this project.', 'assertive');
+            } catch (error) {
+                const errorMessage = 'Error: ' + error.message;
+                document.getElementById('status').innerHTML = '<p style="color: red;">❌ ' + errorMessage + '</p>';
+                announceToScreenReader('Setup failed: ' + error.message, 'assertive');
+                console.error('Setup error:', error);
+            }
+        }
+
+        // Run setup when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeAccessibility();
+            setupProject();
+        });
+    </script>
+</body>
+</html>

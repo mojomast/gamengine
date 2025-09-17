@@ -1,0 +1,397 @@
+/* ===== NEON CLICKER PROJECT STYLES ===== */
+/* Extends shared framework with project-specific customizations */
+
+@import url('../shared/styles.css');
+
+/* ===== PROJECT OVERRIDES ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Orbitron', monospace;
+    background: linear-gradient(135deg, var(--dark-bg-primary), var(--dark-bg-secondary), var(--dark-bg-tertiary));
+    color: var(--text-primary);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ===== LAYOUT COMPONENTS ===== */
+.header {
+    background: rgba(0, 0, 0, 0.8);
+    padding: var(--spacing-lg);
+    text-align: center;
+    border-bottom: 2px solid var(--neon-green);
+    box-shadow: var(--shadow-glow);
+}
+
+.header h1 {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.5rem;
+    color: var(--neon-pink);
+    text-shadow: 0 0 10px var(--neon-blue);
+    margin-bottom: var(--spacing-sm);
+}
+
+.header p {
+    font-size: 0.875rem;
+    color: var(--neon-green);
+}
+
+.nav-buttons {
+    position: absolute;
+    top: var(--spacing-lg);
+    left: var(--spacing-lg);
+    display: flex;
+    gap: var(--spacing-sm);
+    z-index: var(--z-sticky);
+}
+
+.game-container {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-lg);
+}
+
+#gameCanvas {
+    border: 3px solid var(--neon-yellow);
+    border-radius: var(--radius-lg);
+    box-shadow:
+        0 0 20px rgba(255, 215, 0, 0.5),
+        inset 0 0 20px rgba(0, 0, 0, 0.3);
+    background: var(--dark-bg-primary);
+    max-width: 100%;
+    max-height: 100%;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 1000;
+}
+
+.loading h2 {
+    font-family: 'Press Start 2P', cursive;
+    color: #ff206e;
+    margin-bottom: 20px;
+    animation: pulse 1.5s infinite;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #00f593;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+/* ===== NEON CLICKER SPECIFIC STYLES ===== */
+
+.controls {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #00f593;
+    font-size: 12px;
+    text-align: center;
+}
+
+.controls-title {
+    color: #ffd700;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.control-item {
+    display: inline-block;
+    margin: 0 10px;
+    color: #ffffff;
+}
+
+.demo-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+    z-index: 100;
+}
+
+/* ===== BUTTON COMPONENTS ===== */
+.demo-btn {
+  background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
+  border: none;
+  color: var(--text-primary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.6875rem;
+  font-weight: bold;
+  transition: var(--transition-normal);
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.demo-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255, 32, 110, 0.5);
+}
+
+.demo-btn:active {
+    transform: scale(0.95);
+}
+
+.key {
+    background: #333;
+    border: 1px solid #666;
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-family: monospace;
+    color: #00f593;
+}
+
+.engine-info {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ff206e;
+    font-size: 11px;
+    min-width: 200px;
+}
+
+.engine-info h3 {
+    color: #ff206e;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.feature {
+    display: flex;
+    justify-content: space-between;
+    margin: 3px 0;
+    color: #ffffff;
+}
+
+.feature-status {
+    color: #00f593;
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 18px;
+    }
+
+    .game-container {
+        padding: 10px;
+    }
+
+    .controls, .engine-info {
+        position: relative;
+        margin: 10px;
+    }
+
+    .engine-info {
+        order: -1;
+    }
+}
+
+/* Virtual gamepad for mobile */
+.virtual-gamepad {
+    display: none;
+}
+
+@media (max-width: 768px) and (orientation: landscape),
+       (max-width: 480px) {
+    .virtual-gamepad {
+        display: flex !important;
+    }
+}
+
+/* New UI Panel Styles */
+.ui-panel {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid #00f593;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 12px;
+    color: #ffffff;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 15px rgba(0, 245, 147, 0.3);
+    z-index: 100;
+}
+
+.ui-panel h3 {
+    color: #ffd700;
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    text-align: center;
+}
+
+.character-stats-panel {
+    top: 100px;
+    left: 10px;
+    width: 250px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.inventory-panel {
+    top: 100px;
+    right: 10px;
+    width: 300px;
+    max-height: 400px;
+}
+
+.inventory-slots {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+}
+
+.inventory-slot {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid #666;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 10px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+}
+
+.inventory-slot:hover {
+    background: rgba(0, 245, 147, 0.2);
+    border-color: #00f593;
+}
+
+.inventory-slot.filled {
+    background: rgba(255, 215, 0, 0.2);
+}
+
+.ability-panel {
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+}
+
+.ability-slots {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.ability-slot {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid #666;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+}
+
+.ability-slot:hover {
+    background: rgba(5, 217, 232, 0.2);
+    border-color: #05d9e8;
+}
+
+.ability-slot.ready {
+    border-color: #00f593;
+    background: rgba(0, 245, 147, 0.1);
+}
+
+.ability-slot.cooldown {
+    border-color: #666;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.dialog-panel {
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    max-height: 100px;
+    display: none;
+}
+
+.dialog-panel.active {
+    display: block;
+}
+
+#dialogText {
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+#dialogChoices {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.dialog-choice {
+    background: rgba(0, 245, 147, 0.1);
+    border: 1px solid #00f593;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.dialog-choice:hover {
+    background: rgba(0, 245, 147, 0.3);
+}
+
+/* Retro scanlines effect */
+.game-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 0, 0.03) 2px,
+        rgba(0, 255, 0, 0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 5;
+}

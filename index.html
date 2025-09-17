@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#d62828">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Poker Doom">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23d62828'/><text x='50' y='55' font-size='40' text-anchor='middle' fill='white'>🃏</text></svg>">
+    <title>Poker Doom: Mundane Apocalypse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js"></script>
+    <link rel="stylesheet" href="./poker-doom-project/styles.css">
+</head>
+<body>
+    <!-- Skip Links for Screen Readers -->
+    <a href="#main-content" class="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded">Skip to main content</a>
+    <a href="#navigation" class="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-32 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded">Skip to navigation</a>
+            font-size: clamp(1rem, 3vw, 2rem);
+            color: var(--gold);
+            margin-bottom: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+        }
+
+        .start-button {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(1rem, 3vw, 2rem);
+            background: var(--card-red);
+            color: white;
+            border: 4px solid var(--gold);
+            padding: 1rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-shadow: 0 0 5px var(--neon-pink);
+            border-radius: 8px;
+            pointer-events: auto;
+        }
+
+        .start-button:hover {
+            background: #ff0000;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--neon-pink);
+        }
+
+        #game-ui {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            pointer-events: none;
+        }
+
+        #hand-display {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            pointer-events: auto;
+        }
+
+        .card {
+            width: clamp(50px, 12vw, 120px);
+            height: clamp(70px, 17vw, 170px);
+            border-radius: 8px;
+            background: white;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            border: 2px solid gold;
+            user-select: none;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) rotate(5deg);
+            box-shadow: 0 8px 16px rgba(255, 215, 0, 0.7);
+            z-index: 5;
+        }
+
+        .card.selected {
+            transform: translateY(-15px) rotate(10deg);
+            box-shadow: 0 0 25px var(--neon-blue);
+            border-color: var(--neon-pink);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 0.3rem;
+            box-sizing: border-box;
+        }
+
+        .card-back {
+            background: var(--poker-green);
+            transform: rotateY(180deg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            color: gold;
+        }
+
+        .card-front {
+            background: white;
+        }
+
+        .card-rank {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: bold;
+            text-align: left;
+            margin-left: 0.3rem;
+        }
+
+        .card-suit {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            text-align: right;
+            margin-right: 0.3rem;
+        }
+
+        .hearts, .diamonds {
+            color: var(--card-red);
+        }
+
+        .clubs, .spades {
+            color: var(--card-black);
+        }
+
+        #enemy-display {
+            position: absolute;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .enemy-name {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-blue);
+            margin-bottom: 0.5rem;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 2px solid var(--gold);
+        }
+
+        .enemy-health-container {
+            width: clamp(200px, 50vw, 400px);
+            height: 20px;
+            background: var(--card-black);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid var(--gold);
+            margin: 0 auto;
+        }
+
+        .enemy-health {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+            transition: width 0.3s;
+        }
+
+        #player-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            pointer-events: none;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--gold);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--gold);
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--neon-green);
+        }
+
+        #action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            pointer-events: auto;
+        }
+
+        .action-button {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(0.8rem, 2vw, 1.2rem);
+            background: var(--card-red);
+            color: white;
+            border: 2px solid var(--gold);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 4px;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .action-button:hover {
+            background: #ff0000;
+            transform: scale(1.05);
+        }
+
+        .action-button:disabled {
+            background: #444;
+            color: #666;
+            cursor: not-allowed;
+            border-color: #333;
+        }
+
+        #hand-strength-meter {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform: translate(-50%, 50%);
+            width: clamp(200px, 60vw, 400px);
+            height: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid var(--gold);
+            pointer-events: none;
+        }
+
+        #hand-strength-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--neon-green), var(--gold));
+            transition: width 0.3s;
+        }
+
+        #hand-strength-label {
+            position: absolute;
+            top: -2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: var(--gold);
+            text-shadow: 0 0 5px var(--neon-blue);
+            pointer-events: none;
+        }
+
+        #game-world {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23111"/><text y="50" font-size="10" text-anchor="middle" fill="%23333">DOOM</text></svg>');
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .pixel-art {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        .damage-text {
+            position: absolute;
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 0 5px var(--neon-pink), 0 0 10px var(--neon-blue);
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            pointer-events: none;
+            animation: floatUp 1s forwards;
+            z-index: 15;
+        }
+
+        .status-effect {
+            position: absolute;
+            font-size: clamp(1rem, 2.5vw, 2rem);
+            font-weight: bold;
+            text-transform: uppercase;
+            pointer-events: none;
+            z-index: 15;
+            animation: statusPulse 1.5s infinite alternate;
+        }
+
+        .bleeding {
+            color: var(--blood-red);
+            text-shadow: 0 0 5px rgba(139, 0, 0, 0.7);
+        }
+
+        .stunned {
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px rgba(5, 217, 232, 0.7);
+        }
+
+        .burning {
+            color: var(--card-red);
+            text-shadow: 0 0 5px rgba(214, 40, 40, 0.7);
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 5px var(--neon-blue), 0 0 10px rgba(5, 217, 232, 0.3); }
+            to { text-shadow: 0 0 10px var(--neon-blue), 0 0 20px rgba(5, 217, 232, 0.7); }
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
+        }
+
+        @keyframes statusPulse {
+            from { text-shadow: 0 0 5px currentColor; }
+            to { text-shadow: 0 0 15px currentColor; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.3s;
+        }
+
+        #mobile-controls {
+            position: fixed;
+            bottom: 1rem;
+            left: 0;
+            right: 0;
+            display: none;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            pointer-events: auto;
+        }
+
+        .mobile-btn {
+            width: 60px;
+            height: 60px;
+            background: var(--card-red);
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .mobile-btn:active {
+            background: #ff0000;
+            transform: scale(0.95);
+        }
+
+        @media (max-width: 768px) {
+            #mobile-controls {
+                display: flex;
+            }
+
+            #hand-display {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .card {
+                width: 20vw;
+                height: 28vw;
+                min-width: 60px;
+                min-height: 84px;
+            }
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Accessibility Styles */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .skip-link:focus {
+            position: static;
+            width: auto;
+            height: auto;
+            padding: 0.5rem 1rem;
+            margin: 0;
+            overflow: visible;
+            clip: auto;
+            white-space: normal;
+            border: 2px solid #007acc;
+            background: #ffffff;
+            color: #000000;
+            z-index: 10000;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="game-world">
+            <canvas id="engineCanvas" class="pixel-art" style="width: 100%; height: 100%; display: block;" aria-label="Game world canvas" role="img"></canvas>
+        </div>
+
+        <!-- Navigation Section -->
+        <nav id="navigation" aria-label="Game controls">
+            <h2 class="sr-only">Game Controls</h2>
+            <div id="mobile-controls" aria-label="Mobile game controls">
+                <div class="mobile-btn" id="mobile-fold" aria-label="Fold current hand">🚩</div>
+                <div class="mobile-btn" id="mobile-play" aria-label="Play current hand">♠️</div>
+                <div class="mobile-btn" id="mobile-bluff" aria-label="Bluff opponent">😈</div>
+            </div>
+        </nav>
+
+        <main id="main-content">
+        <div id="hud">
+            <section id="title-screen" aria-labelledby="game-title">
+                <h1 id="game-title" class="screen-title">POKER DOOM</h1>
+                <p class="screen-subtitle">Survive the Mundane Apocalypse</p>
+                <button class="start-button" id="start-button" aria-describedby="game-title">START GAME</button>
+            </section>
+
+            <section id="game-over-screen" aria-labelledby="game-over-title">
+                <h1 class="screen-title" id="game-over-title">GAME OVER</h1>
+                <p class="screen-subtitle" id="game-over-message">You failed at life. Literally.</p>
+                <button class="start-button" id="restart-button" aria-describedby="game-over-title">TRY AGAIN</button>
+            </section>
+
+            <section id="enemy-display" aria-label="Enemy information">
+                <h2 class="sr-only">Enemy Status</h2>
+                <div class="enemy-name" id="current-enemy" aria-live="polite">THE VOID</div>
+                <div class="enemy-health-container" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" aria-label="Enemy health">
+                    <div class="enemy-health" id="enemy-health-bar" style="width: 100%;"></div>
+                </div>
+            </section>
+
+            <section id="player-stats" aria-label="Player statistics">
+                <h2 class="sr-only">Player Stats</h2>
+                <div class="stat-box">
+                    <div class="stat-label">Health</div>
+                    <div class="stat-value" id="player-health" aria-live="polite">100</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Chips</div>
+                    <div class="stat-value" id="player-chips" aria-live="polite">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Level</div>
+                    <div class="stat-value" id="player-level" aria-live="polite">1</div>
+                </div>
+            </section>
+
+            <section id="hand-strength" aria-label="Hand strength meter">
+                <h2 class="sr-only">Hand Strength</h2>
+                <div id="hand-strength-meter" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Hand strength">
+                    <div id="hand-strength-fill"></div>
+                </div>
+                <div id="hand-strength-label" aria-live="polite">HAND STRENGTH: NONE</div>
+            </section>
+
+            <section id="hand-display" aria-label="Current hand cards">
+                <h2 class="sr-only">Current Hand</h2>
+            </section>
+
+            <section id="action-buttons" aria-label="Game actions">
+                <h2 class="sr-only">Game Actions</h2>
+                <button class="action-button" id="fold-btn" aria-label="Fold current hand">FOLD</button>
+                <button class="action-button" id="play-btn" disabled aria-label="Play current hand" aria-describedby="play-btn-desc">PLAY HAND</button>
+                <div id="play-btn-desc" class="sr-only">Disabled until you have cards to play</div>
+                <button class="action-button" id="bluff-btn" aria-label="Bluff opponent">BLUFF</button>
+            </section>
+        </div>
+        </main>
+
+        <!-- Screen Reader Announcements -->
+        <div id="sr-announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+        <div id="sr-status" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
+
+        <div id="mobile-controls">
+            <div class="mobile-btn" id="mobile-fold" aria-label="Fold current hand">🚩</div>
+            <div class="mobile-btn" id="mobile-play" aria-label="Play current hand">♠️</div>
+            <div class="mobile-btn" id="mobile-bluff" aria-label="Bluff opponent">😈</div>
+        </div>
+    </div>
+
+    <!-- Project Management Integration -->
+    <script>
+        console.log('🎮 Loading Project Management...');
+        
+        // Test if script loading works
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎮 DOM Ready - Setting up Project Management');
+            
+            // Add floating action button
+            const fab = document.createElement('button');
+            fab.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 60px;
+                height: 60px;
+                background: linear-gradient(45deg, #ff206e, #05d9e8);
+                border: none;
+                border-radius: 50%;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                box-shadow: 0 4px 15px rgba(255, 32, 110, 0.4);
+                z-index: 10000;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            fab.innerHTML = '🎮';
+            fab.title = 'Open Project Manager (F9)';
+            
+            fab.addEventListener('click', function() {
+                console.log('🎮 Opening Project Manager via button...');
+                window.open('./project-manager.html', 'ProjectManager', 
+                    'width=1400,height=900,menubar=yes,toolbar=yes,scrollbars=yes,resizable=yes');
+            });
+            
+            document.body.appendChild(fab);
+            
+            // Add keyboard shortcuts (using Function keys for maximum compatibility)
+            document.addEventListener('keydown', function(e) {
+                console.log('🔍 Key event detected:', {
+                    key: e.key,
+                    code: e.code,
+                    altKey: e.altKey,
+                    ctrlKey: e.ctrlKey,
+                    shiftKey: e.shiftKey,
+                    which: e.which,
+                    keyCode: e.keyCode
+                });
+                
+                // F9 - Open Project Manager
+                if (e.key === 'F9' || e.code === 'F9') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🎮 F9 pressed - Opening Project Manager...');
+                    window.open('./project-manager.html', 'ProjectManager', 
+                        'width=1400,height=900,menubar=yes,toolbar=yes,scrollbars=yes,resizable=yes');
+                    return false;
+                }
+                
+                // F10 - Preserve current project
+                if (e.key === 'F10' || e.code === 'F10') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('💾 F10 pressed - Preserving current project...');
+                    
+                    const preservation = {
+                        timestamp: Date.now(),
+                        reason: 'Manual preservation via F10',
+                        url: window.location.href,
+                        title: document.title,
+                        content: document.documentElement.outerHTML
+                    };
+                    
+                    const key = `pm_preservation_${preservation.timestamp}`;
+                    localStorage.setItem(key, JSON.stringify(preservation));
+                    
+                    // Show notification
+                    const notification = document.createElement('div');
+                    notification.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: rgba(0, 245, 147, 0.9);
+                        color: white;
+                        padding: 15px 20px;
+                        border-radius: 8px;
+                        z-index: 10001;
+                        font-family: monospace;
+                        font-size: 14px;
+                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+                    `;
+                    notification.textContent = '💾 Project preserved successfully!';
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => notification.remove(), 3000);
+                    return false;
+                }
+                
+                // F11 - Show restore options (but check for conflicts)
+                if (e.key === 'F8' || e.code === 'F8') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🔙 F8 pressed - Showing restore options...');
+                    
+                    const preservations = [];
+                    for (let key in localStorage) {
+                        if (key.startsWith('pm_preservation_')) {
+                            try {
+                                const data = JSON.parse(localStorage.getItem(key));
+                                preservations.push({ key, data });
+                            } catch (error) {
+                                console.warn('Failed to parse preservation:', key);
+                            }
+                        }
+                    }
+                    
+                    if (preservations.length === 0) {
+                        alert('No preserved projects found. Use F10 to preserve your current work first.');
+                        return false;
+                    }
+                    
+                    preservations.sort((a, b) => b.data.timestamp - a.data.timestamp);
+                    
+                    let message = 'Available preservations:\\n\\n';
+                    preservations.slice(0, 5).forEach((p, index) => {
+                        message += `${index + 1}. ${new Date(p.data.timestamp).toLocaleString()} - ${p.data.reason}\\n`;
+                    });
+                    
+                    const choice = prompt(message + '\\nEnter number to restore (or cancel):');
+                    if (choice && !isNaN(choice)) {
+                        const selected = preservations[parseInt(choice) - 1];
+                        if (selected) {
+                            if (confirm(`Restore from: ${selected.data.reason}\\nCreated: ${new Date(selected.data.timestamp).toLocaleString()}\\n\\nThis will replace your current work. Continue?`)) {
+                                document.open();
+                                document.write(selected.data.content);
+                                document.close();
+                            }
+                        }
+                    }
+                    return false;
+                }
+                
+                // Also add a simple key test - press 'T' to test
+                if (e.key === 't' && !e.ctrlKey && !e.altKey && !e.shiftKey) {
+                    console.log('✅ Test key (T) works! Keyboard events are functioning.');
+                    
+                    const testNotif = document.createElement('div');
+                    testNotif.style.cssText = `
+                        position: fixed;
+                        top: 60px;
+                        right: 20px;
+                        background: rgba(0, 150, 255, 0.9);
+                        color: white;
+                        padding: 10px 15px;
+                        border-radius: 8px;
+                        z-index: 10001;
+                        font-family: monospace;
+                        font-size: 12px;
+                    `;
+                    testNotif.textContent = '✅ Keyboard test successful!';
+                    document.body.appendChild(testNotif);
+                    setTimeout(() => testNotif.remove(), 2000);
+                }
+            });
+            
+            console.log('✅ Project Management shortcuts active!');
+            console.log('💡 Shortcuts: F9 (Manager), F10 (Save), F8 (Restore)');
+            console.log('💡 Test: Press T to test if keyboard events work');
+        });
+    </script>
+    
+    <!-- Main Game Script (Optional - Create if needed) -->
+    <!-- <script type="module" src="js/main.js"></script> -->
+
+    <!-- Engine Wiring: initialize GameEngine on the canvas and minimal scene + UI hooks -->
+    <script type="module">
+        import { GameEngine } from './game-engine/src/core/GameEngine.js';
+        import { Scene } from './game-engine/src/core/Scene.js';
+        import { EventBus } from './game-engine/src/core/EventBus.js';
+        import { ResourceManager } from './game-engine/src/core/ResourceManager.js';
+        import { Renderer } from './game-engine/src/core/Renderer.js';
+        import { Character } from './game-engine/src/core/Character.js';
+        import { InventoryManager, Item, Weapon, Armor, Consumable } from './game-engine/src/core/InventoryManager.js';
+        import { AbilityManager, OffensiveAbility, DefensiveAbility, UtilityAbility } from './game-engine/src/core/AbilityManager.js';
+        import { AnimationManager } from './game-engine/src/effects/AnimationManager.js';
+        import { ParticleSystem } from './game-engine/src/effects/ParticleSystem.js';
+        import { DialogManager } from './game-engine/src/ui/DialogManager.js';
+
+        class PokerDoomScene extends Scene {
+            constructor(engine) {
+                super('poker', engine);
+            }
+            update(dt) {
+                // DOM-driven UI; scene mainly for background/engine timing
+            }
+            render(ctx) {
+                // Subtle animated grid background
+                const w = ctx.canvas.width, h = ctx.canvas.height;
+                ctx.save();
+                ctx.clearRect(0, 0, w, h);
+                ctx.strokeStyle = 'rgba(0,245,147,0.06)';
+                ctx.lineWidth = 1;
+                const grid = 60;
+                for (let x = 0; x < w; x += grid) {
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+                }
+                for (let y = 0; y < h; y += grid) {
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+                }
+                ctx.restore();
+            }
+        }
+
+        const engine = new GameEngine('engineCanvas', {
+            fps: 60,
+            responsive: true,
+            audioEnabled: false,
+            touchEnabled: true,
+            debug: false
+        });
+        window.engine = engine;
+        engine.addScene('poker', new PokerDoomScene(engine));
+        engine.switchScene('poker');
+        engine.start();
+        console.log('Engine initialized and running on #engineCanvas');
+
+        // Initialize game systems with error handling
+        try {
+            if (!engine.eventBus) engine.eventBus = new EventBus();
+            if (!engine.resources) engine.resources = new ResourceManager();
+            if (!engine.renderer) engine.renderer = new Renderer(engine.canvas);
+            if (!engine.particleSystem) engine.particleSystem = new ParticleSystem(engine);
+            if (!engine.animationManager) engine.animationManager = new AnimationManager(engine);
+            if (!engine.dialogManager) engine.dialogManager = new DialogManager();
+
+            try { engine.emit && engine.emit('engineReady', { engine }); } catch (e) {}
+            try { engine.eventBus.emit('engine:ready', { engine }); } catch (e) {}
+        } catch (error) {
+            console.warn('Failed to initialize some game systems:', error);
+        }
+
+        // Optional resource preload (safe, non-blocking)
+        (async () => {
+            try {
+                // Attempt to fetch example manifest if served; ignore if unavailable
+                const res = await fetch('./game-engine/assets/manifest.example.json', { cache: 'no-store' });
+                if (res && res.ok) {
+                    const manifest = await res.json();
+                    await engine.resources.preloadAll(manifest);
+                    console.log('Preloaded example manifest');
+                } else {
+                    // Fallback to empty manifest
+                    await engine.resources.preloadAll({ textures: [], audio: [], json: [] });
+                }
+            } catch (e) {
+                // Safe to ignore in development
+                console.log('Resource preload skipped (optional):', e?.message || e);
+            }
+        })();
+
+        // DOM helpers
+        const $ = (id) => document.getElementById(id);
+        const enemyNameEl = $('current-enemy');
+        const enemyHealthBar = $('enemy-health-bar');
+        const playerHealthEl = $('player-health');
+        const playerChipsEl = $('player-chips');
+        const playerLevelEl = $('player-level');
+        const handFill = $('hand-strength-fill');
+        const handLabel = $('hand-strength-label');
+        const titleScreen = $('title-screen');
+        const gameOverScreen = $('game-over-screen');
+        const gameOverTitle = $('game-over-title');
+        const gameOverMessage = $('game-over-message');
+
+        // Initialize game systems
+        const character = new Character({
+            health: 100,
+            maxHealth: 100,
+            mana: 50,
+            maxMana: 50,
+            level: 1,
+            experience: 0,
+            strength: 10,
+            agility: 10,
+            intelligence: 10
+        });
+
+        const inventoryManager = new InventoryManager(50);
+        const abilityManager = new AbilityManager(character, engine);
+
+        // Add some starting abilities
+        const fireBolt = new OffensiveAbility('Fire Bolt', 'Hurls a bolt of fire', 25, 'single', 2.0, 15, 'mana');
+        const shieldWall = new DefensiveAbility('Shield Wall', 'Creates a protective barrier', 10, 5.0, 'self', 3.0, 20, 'mana');
+        const healSelf = new UtilityAbility('Heal', 'Restores health', 'heal', 'self', 2.5, 25, 'mana');
+        abilityManager.addAbility(fireBolt);
+        abilityManager.addAbility(shieldWall);
+        abilityManager.addAbility(healSelf);
+
+        // Add starting items
+        const healthPotion = new Consumable(1, 'Health Potion', 'Restores 50 HP', (char) => char.heal(50), 5, 'common', 25);
+        const ironSword = new Weapon(2, 'Iron Sword', 'A sturdy blade', 15, 'sword', 'common', 100);
+        inventoryManager.addItem(healthPotion);
+        inventoryManager.addItem(ironSword);
+
+        const state = {
+            player: character,
+            enemy: { name: 'THE VOID', health: 100, maxHealth: 100 },
+            chips: 0
+        };
+
+        function updateStats() {
+            playerHealthEl.textContent = `${Math.max(0, Math.round(state.player.health))}/${state.player.maxHealth}`;
+            playerChipsEl.textContent = state.chips;
+            playerLevelEl.textContent = state.player.level;
+            enemyNameEl.textContent = state.enemy.name;
+            enemyHealthBar.style.width = `${Math.max(0, state.enemy.health)}%`;
+        }
+
+        function setHandStrength(value) {
+            const v = Math.max(0, Math.min(100, Math.round(value)));
+            handFill.style.width = `${v}%`;
+            handLabel.textContent = `HAND STRENGTH: ${v}`;
+            return v;
+        }
+
+        function damageEnemy(amount) {
+            state.enemy.health = Math.max(0, state.enemy.health - amount);
+            engine.particleSystem?.createClickEffect(engine.canvas.width / 2, engine.canvas.height / 2);
+            if (state.enemy.health <= 0) {
+                // Enemy defeated: reward and next level
+                state.chips += 25;
+                state.player.gainExperience(100); // Grant XP for victory
+                state.enemy.health = state.enemy.maxHealth;
+                engine.particleSystem?.createRainbowBurst(engine.canvas.width / 2, engine.canvas.height / 2, { count: 20 });
+            }
+            updateStats();
+        }
+
+        function damagePlayer(amount) {
+            state.player.takeDamage(amount);
+            engine.shake(4, 200);
+            updateStats();
+            if (state.player.health <= 0) {
+                showGameOver('GAME OVER', 'You were consumed by the mundane void.');
+            }
+        }
+
+        function showGameOver(title, msg) {
+            gameOverTitle.textContent = title || 'GAME OVER';
+            gameOverMessage.textContent = msg || 'You failed at life. Literally.';
+            gameOverScreen.style.display = 'flex';
+        }
+
+        function hideGameOver() {
+            gameOverScreen.style.display = 'none';
+        }
+
+        function startGame() {
+            titleScreen.style.display = 'none';
+            hideGameOver();
+            // Reset character stats
+            Object.assign(state.player, {
+                health: state.player.maxHealth,
+                mana: state.player.maxMana,
+                level: 1,
+                experience: 0
+            });
+            state.chips = 0;
+            // Reset enemy
+            state.enemy = { name: 'THE VOID', health: 100, maxHealth: 100 };
+            setHandStrength(0);
+            updateStats();
+        }
+
+        function playHand() {
+            // Use Fire Bolt ability if available, otherwise use basic attack
+            if (abilityManager.useAbility('Fire Bolt', state.enemy)) {
+                const strength = setHandStrength(30 + Math.random() * 70);
+                const damage = Math.round(strength * 0.7 + Math.random() * 8);
+                damageEnemy(damage);
+                try { engine.eventBus?.emit('game:playHand', { strength, damage, ability: 'Fire Bolt' }); } catch (e) {}
+            } else {
+                // Fallback to basic attack
+                const strength = setHandStrength(20 + Math.random() * 50);
+                const damage = Math.round(strength * 0.5 + Math.random() * 5);
+                damageEnemy(damage);
+                try { engine.eventBus?.emit('game:playHand', { strength, damage, ability: 'basic' }); } catch (e) {}
+            }
+        }
+
+        function foldHand() {
+            setHandStrength(0);
+            // Try to use Shield Wall for defense
+            if (abilityManager.useAbility('Shield Wall', state.player)) {
+                try { engine.eventBus?.emit('game:fold', { ability: 'Shield Wall' }); } catch (e) {}
+            } else {
+                try { engine.eventBus?.emit('game:fold', { ability: 'basic' }); } catch (e) {}
+            }
+            engine.particleSystem?.createTrail(engine.canvas.width / 2, engine.canvas.height / 2, { color: '#05d9e8', life: 300 });
+        }
+
+        function bluff() {
+            const success = Math.random() < 0.5;
+            if (success) {
+                // Use Heal ability to bluff recovery
+                if (abilityManager.useAbility('Heal', state.player)) {
+                    const damage = 35 + Math.round(Math.random() * 25);
+                    damageEnemy(damage);
+                    try { engine.eventBus?.emit('game:bluff', { success: true, damage, ability: 'Heal' }); } catch (e) {}
+                } else {
+                    const damage = 35 + Math.round(Math.random() * 25);
+                    damageEnemy(damage);
+                    try { engine.eventBus?.emit('game:bluff', { success: true, damage, ability: 'basic' }); } catch (e) {}
+                }
+            } else {
+                const dmg = 10 + Math.round(Math.random() * 10);
+                damagePlayer(dmg);
+                try { engine.eventBus?.emit('game:bluff', { success: false, damage: dmg }); } catch (e) {}
+            }
+        }
+
+        // Hook up buttons
+        $('start-button')?.addEventListener('click', startGame);
+        $('restart-button')?.addEventListener('click', startGame);
+        $('play-btn')?.addEventListener('click', playHand);
+        $('fold-btn')?.addEventListener('click', foldHand);
+        $('bluff-btn')?.addEventListener('click', bluff);
+        $('mobile-play')?.addEventListener('click', playHand);
+        $('mobile-fold')?.addEventListener('click', foldHand);
+        $('mobile-bluff')?.addEventListener('click', bluff);
+
+        // Initialize HUD
+        updateStats();
+
+        // Accessibility Enhancements
+        function announceToScreenReader(message, priority = 'polite') {
+            const target = priority === 'assertive' ? 'sr-status' : 'sr-announcements';
+            const announcer = document.getElementById(target);
+            if (announcer) {
+                announcer.textContent = message;
+                // Clear after a delay for assertive messages
+                if (priority === 'assertive') {
+                    setTimeout(() => { announcer.textContent = ''; }, 1000);
+                }
+            }
+        }
+
+        function updateAriaValues() {
+            // Update progress bar values
+            const enemyHealthBar = $('enemy-health-bar');
+            const handStrengthMeter = $('hand-strength-meter');
+            if (enemyHealthBar) {
+                const enemyHealthContainer = enemyHealthBar.parentElement;
+                const currentWidth = parseFloat(enemyHealthBar.style.width) || 100;
+                enemyHealthContainer.setAttribute('aria-valuenow', Math.round(currentWidth));
+            }
+            if (handStrengthMeter) {
+                const fillWidth = parseFloat($('hand-strength-fill')?.style.width) || 0;
+                handStrengthMeter.setAttribute('aria-valuenow', Math.round(fillWidth));
+            }
+        }
+
+        // Enhanced button handlers with accessibility
+        function enhanceButtonAccessibility(buttonId, action) {
+            const button = $(buttonId);
+            if (button) {
+                button.addEventListener('click', function() {
+                    announceToScreenReader(`${this.textContent || this.getAttribute('aria-label')} activated`);
+                    action();
+                });
+                button.addEventListener('focus', function() {
+                    announceToScreenReader(`${this.textContent || this.getAttribute('aria-label')} focused`, 'assertive');
+                });
+            }
+        }
+
+        // Keyboard shortcut announcements
+        function announceKeyboardShortcut(shortcut, description) {
+            announceToScreenReader(`Keyboard shortcut: ${shortcut} - ${description}`);
+        }
+
+        // Call on game events
+        function onGameStateChange(event, data) {
+            switch(event) {
+                case 'startGame':
+                    announceToScreenReader('Game started. Use action buttons to play poker against the void.');
+                    break;
+                case 'enemyDefeated':
+                    announceToScreenReader(`Enemy defeated! Gained ${data?.chips || 25} chips and experience.`);
+                    break;
+                case 'playerDamage':
+                    announceToScreenReader(`Player took ${data?.damage || 0} damage. Health: ${data?.health || 0}`);
+                    break;
+                case 'gameOver':
+                    announceToScreenReader('Game over. Press restart button to try again.');
+                    break;
+            }
+        }
+
+        // Hook up enhanced accessibility
+        document.addEventListener('DOMContentLoaded', function() {
+            // Announce available keyboard shortcuts
+            setTimeout(() => {
+                announceToScreenReader('Available keyboard shortcuts: F9 for project manager, F10 to save project, F8 to restore project, T to test keyboard');
+            }, 2000);
+
+            // Update ARIA values periodically
+            setInterval(updateAriaValues, 500);
+        });
+
+        // Enhanced damage functions with announcements
+        const originalDamageEnemy = damageEnemy;
+        damageEnemy = function(amount) {
+            originalDamageEnemy(amount);
+            if (state.enemy.health <= 0) {
+                onGameStateChange('enemyDefeated', { chips: 25 });
+            }
+            updateAriaValues();
+        };
+
+        const originalDamagePlayer = damagePlayer;
+        damagePlayer = function(amount) {
+            originalDamagePlayer(amount);
+            onGameStateChange('playerDamage', { damage: amount, health: state.player.health });
+            updateAriaValues();
+        };
+
+        const originalStartGame = startGame;
+        startGame = function() {
+            originalStartGame();
+            onGameStateChange('startGame');
+            updateAriaValues();
+        };
+
+        const originalShowGameOver = showGameOver;
+        showGameOver = function(title, msg) {
+            originalShowGameOver(title, msg);
+            onGameStateChange('gameOver');
+        };
+
+        // Keyboard shortcut enhancements
+        document.addEventListener('keydown', function(e) {
+            // Announce shortcuts when used
+            if (e.key === 'F9' || e.code === 'F9') {
+                announceKeyboardShortcut('F9', 'Open Project Manager');
+            } else if (e.key === 'F10' || e.code === 'F10') {
+                announceKeyboardShortcut('F10', 'Save current project');
+            } else if (e.key === 'F8' || e.code === 'F8') {
+                announceKeyboardShortcut('F8', 'Show restore options');
+            } else if (e.key === 't' && !e.ctrlKey && !e.altKey && !e.shiftKey) {
+                announceKeyboardShortcut('T', 'Test keyboard functionality');
+            }
+        });
+    </script>
+</body>
+</html>

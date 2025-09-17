@@ -1,0 +1,455 @@
+/* ===== POKER DOOM PROJECT STYLES ===== */
+/* Extends shared framework with project-specific customizations */
+
+@import url('../shared/styles.css');
+
+/* ===== PROJECT-SPECIFIC CUSTOM PROPERTIES ===== */
+:root {
+    /* Extend shared colors with poker-specific palette */
+    --poker-green: #1a4d2e;
+    --card-red: #d62828;
+    --card-black: #0f0f0f;
+    --blood-red: #8b0000;
+}
+
+/* ===== PROJECT OVERRIDES ===== */
+body {
+    font-family: 'Silkscreen', cursive;
+    color: var(--neon-yellow);
+}
+
+#game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+#title-screen, #game-over-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    text-align: center;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+#game-over-screen {
+    display: none;
+}
+
+/* ===== SCREEN COMPONENTS ===== */
+.screen-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(2rem, 8vw, 6rem);
+    color: var(--neon-pink);
+    text-shadow: 0 0 10px var(--neon-blue), 0 0 20px rgba(5, 217, 232, 0.5);
+    margin-bottom: var(--spacing-lg);
+    animation: glow 1.5s infinite alternate;
+}
+
+.screen-subtitle {
+    font-size: clamp(1rem, 3vw, 2rem);
+    color: var(--neon-yellow);
+    margin-bottom: var(--spacing-2xl);
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+}
+
+.start-button {
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(1rem, 3vw, 2rem);
+    background: var(--card-red);
+    color: white;
+    border: 4px solid var(--neon-yellow);
+    padding: var(--spacing-md) var(--spacing-lg);
+    cursor: pointer;
+    transition: var(--transition-normal);
+    text-shadow: 0 0 5px var(--neon-pink);
+    border-radius: var(--radius-lg);
+    pointer-events: auto;
+    min-width: 160px;
+    text-align: center;
+}
+
+.start-button:hover {
+    background: var(--neon-red);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px var(--neon-pink);
+}
+
+#game-ui {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    pointer-events: none;
+}
+
+#hand-display {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    pointer-events: auto;
+}
+
+.card {
+    width: clamp(50px, 12vw, 120px);
+    height: clamp(70px, 17vw, 170px);
+    border-radius: 8px;
+    background: white;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    border: 2px solid gold;
+    user-select: none;
+}
+
+.card:hover {
+    transform: translateY(-10px) rotate(5deg);
+    box-shadow: 0 8px 16px rgba(255, 215, 0, 0.7);
+    z-index: 5;
+}
+
+.card.selected {
+    transform: translateY(-15px) rotate(10deg);
+    box-shadow: 0 0 25px var(--neon-blue);
+    border-color: var(--neon-pink);
+}
+
+.card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.3rem;
+    box-sizing: border-box;
+}
+
+.card-back {
+    background: var(--poker-green);
+    transform: rotateY(180deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    color: gold;
+}
+
+.card-front {
+    background: white;
+}
+
+.card-rank {
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-weight: bold;
+    text-align: left;
+    margin-left: 0.3rem;
+}
+
+.card-suit {
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    text-align: right;
+    margin-right: 0.3rem;
+}
+
+.hearts, .diamonds {
+    color: var(--card-red);
+}
+
+.clubs, .spades {
+    color: var(--card-black);
+}
+
+#enemy-display {
+    position: absolute;
+    top: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    pointer-events: none;
+}
+
+/* ===== ENEMY COMPONENTS ===== */
+.enemy-name {
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    color: var(--neon-pink);
+    text-shadow: 0 0 10px var(--neon-blue);
+    margin-bottom: var(--spacing-sm);
+    background: rgba(0, 0, 0, 0.7);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--neon-yellow);
+}
+
+.enemy-health-container {
+    width: clamp(200px, 50vw, 400px);
+    height: 20px;
+    background: var(--card-black);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid var(--neon-yellow);
+    margin: 0 auto;
+}
+
+.enemy-health {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-blue));
+    transition: width var(--transition-normal);
+}
+
+/* ===== PLAYER STATS ===== */
+#player-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+    pointer-events: none;
+    gap: var(--spacing-md);
+}
+
+.stat-box {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid var(--neon-yellow);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-lg);
+    min-width: 100px;
+    text-align: center;
+    flex: 1;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--neon-yellow);
+    text-transform: uppercase;
+    margin-bottom: var(--spacing-xs);
+    display: block;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--neon-green);
+}
+
+#action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    pointer-events: auto;
+}
+
+/* ===== ACTION COMPONENTS ===== */
+.action-button {
+  font-family: 'Press Start 2P', cursive;
+  font-size: clamp(0.8rem, 2vw, 1.2rem);
+  background: var(--card-red);
+  color: white;
+  border: 2px solid var(--neon-yellow);
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  border-radius: var(--radius-sm);
+  min-width: 120px;
+  min-height: 44px;
+  text-align: center;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+}
+
+.action-button:hover {
+    background: var(--neon-red);
+    transform: scale(1.05);
+}
+
+.action-button:disabled {
+    background: var(--dark-bg-secondary);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    border-color: var(--text-muted);
+    transform: none;
+}
+
+#hand-strength-meter {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    width: clamp(200px, 60vw, 400px);
+    height: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid var(--gold);
+    pointer-events: none;
+}
+
+#hand-strength-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--neon-green), var(--gold));
+    transition: width 0.3s;
+}
+
+#hand-strength-label {
+    position: absolute;
+    top: -2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    color: var(--gold);
+    text-shadow: 0 0 5px var(--neon-blue);
+    pointer-events: none;
+}
+
+#game-world {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23111"/><text y="50" font-size="10" text-anchor="middle" fill="%23333">DOOM</text></svg>');
+    z-index: 1;
+    overflow: hidden;
+}
+
+.pixel-art {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.damage-text {
+    position: absolute;
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 0 5px var(--neon-pink), 0 0 10px var(--neon-blue);
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    pointer-events: none;
+    animation: floatUp 1s forwards;
+    z-index: 15;
+}
+
+.status-effect {
+    position: absolute;
+    font-size: clamp(1rem, 2.5vw, 2rem);
+    font-weight: bold;
+    text-transform: uppercase;
+    pointer-events: none;
+    z-index: 15;
+    animation: statusPulse 1.5s infinite alternate;
+}
+
+.bleeding {
+    color: var(--blood-red);
+    text-shadow: 0 0 5px rgba(139, 0, 0, 0.7);
+}
+
+.stunned {
+    color: var(--neon-blue);
+    text-shadow: 0 0 5px rgba(5, 217, 232, 0.7);
+}
+
+.burning {
+    color: var(--card-red);
+    text-shadow: 0 0 5px rgba(214, 40, 40, 0.7);
+}
+
+/* ===== POKER-SPECIFIC ANIMATIONS ===== */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
+
+#mobile-controls {
+    position: fixed;
+    bottom: 1rem;
+    left: 0;
+    right: 0;
+    display: none;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 100;
+    pointer-events: auto;
+}
+
+.mobile-btn {
+  width: 60px;
+  height: 60px;
+  background: var(--card-red);
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.mobile-btn:active {
+    background: #ff0000;
+    transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+    #mobile-controls {
+        display: flex;
+    }
+
+    #hand-display {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .card {
+        width: 20vw;
+        height: 28vw;
+        min-width: 60px;
+        min-height: 84px;
+    }
+}
+
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 5;
+}

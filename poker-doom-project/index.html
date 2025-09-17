@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#d62828">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Poker Doom">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23d62828'/><text x='50' y='55' font-size='40' text-anchor='middle' fill='white'>🃏</text></svg>">
+    <title>Poker Doom: Mundane Apocalypse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="game-world"></div>
+
+        <div id="hud">
+            <div id="title-screen">
+                <h1 class="screen-title">POKER DOOM</h1>
+                <p class="screen-subtitle">Survive the Mundane Apocalypse</p>
+                <button class="start-button" id="start-button">START GAME</button>
+            </div>
+
+            <div id="game-over-screen">
+                <h1 class="screen-title" id="game-over-title">GAME OVER</h1>
+                <p class="screen-subtitle" id="game-over-message">You failed at life. Literally.</p>
+                <button class="start-button" id="restart-button">TRY AGAIN</button>
+            </div>
+
+            <div id="enemy-display">
+                <div class="enemy-name" id="current-enemy">THE VOID</div>
+                <div class="enemy-health-container">
+                    <div class="enemy-health" id="enemy-health-bar" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <div id="player-stats">
+                <div class="stat-box">
+                    <div class="stat-label">Health</div>
+                    <div class="stat-value" id="player-health">100</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Chips</div>
+                    <div class="stat-value" id="player-chips">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Level</div>
+                    <div class="stat-value" id="player-level">1</div>
+                </div>
+            </div>
+
+            <div id="hand-strength-meter">
+                <div id="hand-strength-fill"></div>
+            </div>
+            <div id="hand-strength-label">HAND STRENGTH: NONE</div>
+
+            <div id="hand-display"></div>
+
+            <div id="action-buttons">
+                <button class="action-button" id="fold-btn">FOLD</button>
+                <button class="action-button" id="play-btn" disabled>PLAY HAND</button>
+                <button class="action-button" id="bluff-btn">BLUFF</button>
+            </div>
+        </div>
+
+        <div id="mobile-controls">
+            <div class="mobile-btn" id="mobile-fold">🚩</div>
+            <div class="mobile-btn" id="mobile-play">♠️</div>
+            <div class="mobile-btn" id="mobile-bluff">😈</div>
+        </div>
+    </div>
+
+    <!-- Project Management Integration -->
+    <script src="script.js"></script>
+
+    <!-- Main Game Script (Optional - Create if needed) -->
+    <!-- <script type="module" src="js/main.js"></script> -->
+</body>
+</html>

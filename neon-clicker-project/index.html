@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#ff206e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Neon Clicker">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23ff206e'/><text x='50' y='55' font-size='40' text-anchor='middle' fill='white'>⚡</text></svg>">
+    <title>Game Engine Demo - Neon Clicker Battle</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <nav class="nav-buttons">
+            <button class="demo-btn" onclick="window.open('../project-manager.html', '_blank')" title="Open the project manager to create and manage game projects">📁 Open Project Manager</button>
+            <button class="demo-btn" onclick="window.open('docs/MASTER-ARCHITECTURE.md', '_blank')" title="Access system configuration and architecture documentation">⚙️ Configure Systems</button>
+            <button class="demo-btn" onclick="window.open('README.md', '_blank')" title="View comprehensive documentation for the game engine">📖 View Documentation</button>
+        </nav>
+        <h1>🎮 GAME ENGINE DEMO - WITH PLAYER CHARACTER 🎮</h1>
+        <p>A comprehensive 2D game engine with integrated player character system featuring movement, abilities, and visual effects</p>
+    </div>
+
+    <div class="game-container">
+        <canvas id="gameCanvas" width="1024" height="768"></canvas>
+
+        <!-- New UI Sections -->
+        <div id="characterStats" class="ui-panel character-stats-panel">
+            <h3>Character Stats</h3>
+            <div id="characterInfo"></div>
+        </div>
+
+        <div id="inventoryGrid" class="ui-panel inventory-panel">
+            <h3>Inventory</h3>
+            <div id="inventorySlots" class="inventory-slots"></div>
+        </div>
+
+        <div id="abilityHotbar" class="ui-panel ability-panel">
+            <h3>Abilities</h3>
+            <div id="abilitySlots" class="ability-slots"></div>
+        </div>
+
+        <div id="dialogPanel" class="ui-panel dialog-panel">
+            <div id="dialogText"></div>
+            <div id="dialogChoices"></div>
+        </div>
+
+        <div class="loading" id="loadingScreen">
+            <h2>INITIALIZING GAME ENGINE...</h2>
+            <div class="spinner"></div>
+        </div>
+
+        <div class="engine-info">
+            <h3>🔧 Engine Features</h3>
+            <div class="feature">
+                <span>Scene Management:</span>
+                <span class="feature-status">✅ Active</span>
+            </div>
+            <div class="feature">
+                <span>Input System:</span>
+                <span class="feature-status">✅ Responsive</span>
+            </div>
+            <div class="feature">
+                <span>Player Character System:</span>
+                <span class="feature-status">✅ Integrated</span>
+            </div>
+            <div class="feature">
+                <span>Movement & Physics:</span>
+                <span class="feature-status">✅ 8-Directional</span>
+            </div>
+            <div class="feature">
+                <span>Particle Effects:</span>
+                <span class="feature-status">✅ Dynamic</span>
+            </div>
+            <div class="feature">
+                <span>Animation System:</span>
+                <span class="feature-status">✅ Smooth</span>
+            </div>
+            <div class="feature">
+                <span>Health/Energy System:</span>
+                <span class="feature-status">✅ Visual HUD</span>
+            </div>
+            <div class="feature">
+                <span>Trail Effects:</span>
+                <span class="feature-status">✅ Real-time</span>
+            </div>
+            <div class="feature">
+                <span>Ability System:</span>
+                <span class="feature-status">✅ Energy-based</span>
+            </div>
+            <div class="feature">
+                <span>UI Framework:</span>
+                <span class="feature-status">✅ Modular</span>
+            </div>
+            <div class="feature">
+                <span>Audio Manager:</span>
+                <span class="feature-status">✅ Spatial</span>
+            </div>
+            <div class="feature">
+                <span>Game Objects:</span>
+                <span class="feature-status">✅ Component-based</span>
+            </div>
+            <div class="feature">
+                <span>State Management:</span>
+                <span class="feature-status">✅ Persistent</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="controls-title">🎯 Player Controls</div>
+            <div class="control-item">
+                <span class="key">WASD</span> Move Player Character
+            </div>
+            <div class="control-item">
+                <span class="key">↑↓←→</span> Alternative Movement
+            </div>
+            <div class="control-item">
+                <span class="key">SPACE</span> Player Attack (15 Energy)
+            </div>
+            <div class="control-item">
+                <span class="key">Q</span> Dash Left (25 Energy)
+            </div>
+            <div class="control-item">
+                <span class="key">E</span> Dash Right (25 Energy)
+            </div>
+            <div class="control-item">
+                <span class="key">CLICK</span> Create Particle Effects
+            </div>
+            <div class="control-item">
+                <span class="key">ESC</span> Pause/Menu
+            </div>
+        </div>
+
+        <!-- Demo Control Buttons -->
+        <div class="demo-controls">
+            <button id="demoCharacterBtn" class="demo-btn">📊 Character Demo</button>
+            <button id="demoInventoryBtn" class="demo-btn">🎒 Inventory Demo</button>
+            <button id="demoAbilityBtn" class="demo-btn">⚡ Ability Demo</button>
+            <button id="demoDialogBtn" class="demo-btn">💬 Dialog Demo</button>
+        </div>
+
+        <!-- Save/Load Control Panel -->
+        <div id="saveLoadPanel" class="ui-panel" style="top: 10px; right: 10px; width: 200px; background: rgba(0, 0, 0, 0.9); border: 2px solid #00f593;">
+            <h3 style="color: #ffd700; margin-bottom: 10px;">💾 Game Save</h3>
+            <div id="saveSlots" style="margin-bottom: 10px;">
+                <button id="saveSlot1" class="demo-btn" style="width: 100%; margin-bottom: 5px;">Save Slot 1</button>
+                <button id="loadSlot1" class="demo-btn" style="width: 100%; margin-bottom: 5px;">Load Slot 1</button>
+                <button id="saveSlot2" class="demo-btn" style="width: 100%; margin-bottom: 5px;">Save Slot 2</button>
+                <button id="loadSlot2" class="demo-btn" style="width: 100%; margin-bottom: 5px;">Load Slot 2</button>
+                <button id="saveSlot3" class="demo-btn" style="width: 100%; margin-bottom: 5px;">Save Slot 3</button>
+                <button id="loadSlot3" class="demo-btn" style="width: 100%; margin-bottom: 5px;">Load Slot 3</button>
+            </div>
+            <button id="exportSave" class="demo-btn" style="width: 100%; margin-bottom: 5px;">📤 Export Save</button>
+            <button id="importSave" class="demo-btn" style="width: 100%;">📥 Import Save</button>
+            <input type="file" id="importFileInput" style="display: none;" accept=".json">
+        </div>
+
+        <!-- Save/Load Notification -->
+        <div id="saveNotification" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.9); color: #00f593; padding: 20px; border: 2px solid #00f593; border-radius: 8px; font-size: 16px; text-align: center; display: none; z-index: 2000;">
+            <div id="notificationText">Game Saved!</div>
+        </div>
+    </div>
+</body>
+<script src="script.js"></script>
+</html>

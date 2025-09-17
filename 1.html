@@ -1,0 +1,630 @@
+
+Design Arena
+Design Arena
+Models
+Builders
+Media
+Audio
+Compare
+About
+
+Game Dev
+idle clicker about rainbows about building rainbows but its balatro
+Which one do you like more?
+
+
+
+27.8s
+Loading...
+
+Loading preview...
+
+Preview Unavailable
+Unable to load preview
+
+Retry (1/3)
+
+
+Vote as Winner
+
+
+36.4s
+Loading...
+
+Loading preview...
+
+Preview Unavailable
+Unable to load preview
+
+Retry (1/3)
+
+
+Vote as Winner
+Model B
+
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rainbow Builder - Idle Clicker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff0000, #ff9900, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 200px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+
+        .main-content {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .rainbow-display {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+        }
+
+        .rainbow {
+            width: 100%;
+            height: 200px;
+            background: conic-gradient(
+                #ff0000, #ff8000, #ffff00, #80ff00, 
+                #00ff80, #00ffff, #0080ff, #0000ff, 
+                #8000ff, #ff00ff, #ff0080, #ff0000
+            );
+            border-radius: 50%;
+            margin: 20px 0;
+            position: relative;
+            animation: rotate 10s linear infinite;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .click-area {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            text-align: center;
+            transition: all 0.2s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .click-area:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .click-area:active {
+            transform: scale(0.95);
+        }
+
+        .upgrades {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+        }
+
+        .upgrades h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ffcc00;
+        }
+
+        .upgrade-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .upgrade {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .upgrade:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .upgrade h3 {
+            color: #ff9900;
+            margin-bottom: 10px;
+        }
+
+        .upgrade p {
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+
+        .cost {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+
+        .disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .disabled:hover {
+            transform: none;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: none;
+        }
+
+        .particles {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .achievements {
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+        }
+
+        .achievements h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #ffcc00;
+        }
+
+        .achievement-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .achievement {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: help;
+            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .achievement.unlocked {
+            background: linear-gradient(45deg, #ff9900, #ffcc00);
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .achievement:hover .tooltip {
+            opacity: 1;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #ffcc00;
+            padding: 15px;
+            border-radius: 10px;
+            transform: translateX(200%);
+            transition: transform 0.5s ease;
+            z-index: 1000;
+            border: 1px solid rgba(255, 204, 0, 0.5);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stat-box {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🌈 Rainbow Builder 🌈</h1>
+            <p>Click to build rainbows and unlock powerful upgrades!</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <h3>Rainbow Points</h3>
+                <div class="stat-value" id="points">0</div>
+            </div>
+            <div class="stat-box">
+                <h3>Points per Click</h3>
+                <div class="stat-value" id="perClick">1</div>
+            </div>
+            <div class="stat-box">
+                <h3>Points per Second</h3>
+                <div class="stat-value" id="perSecond">0</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="rainbow-display">
+                <h2>Build Your Rainbow!</h2>
+                <div class="rainbow" id="rainbow"></div>
+                <div class="click-area" id="clickArea">
+                    <div>Click Me!</div>
+                    <div>+</div>
+                    <div id="clickValue">1</div>
+                </div>
+            </div>
+
+            <div class="upgrades">
+                <h2>Upgrades</h2>
+                <div class="upgrade-list" id="upgradeList">
+                    <!-- Upgrades will be generated here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="achievements">
+            <h2>Achievements</h2>
+            <div class="achievement-list" id="achievementList">
+                <!-- Achievements will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        Achievement Unlocked!
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            points: 0,
+            perClick: 1,
+            perSecond: 0,
+            upgrades: [
+                { id: 1, name: "Better Clicking", cost: 10, value: 1, type: "click", description: "Double your clicking power" },
+                { id: 2, name: "Rainbow Generator", cost: 50, value: 1, type: "auto", description: "Generate 1 point per second" },
+                { id: 3, name: "Super Click", cost: 100, value: 5, type: "click", description: "Add 5 points per click" },
+                { id: 4, name: "Rainbow Factory", cost: 500, value: 10, type: "auto", description: "Generate 10 points per second" },
+                { id: 5, name: "Ultra Click", cost: 1000, value: 20, type: "click", description: "Add 20 points per click" },
+                { id: 6, name: "Rainbow Empire", cost: 5000, value: 50, type: "auto", description: "Generate 50 points per second" },
+                { id: 7, name: "Quantum Click", cost: 10000, value: 100, type: "click", description: "Add 100 points per click" },
+                { id: 8, name: "Multiverse Rainbow", cost: 50000, value: 200, type: "auto", description: "Generate 200 points per second" }
+            ],
+            achievements: [
+                { id: 1, name: "First Rainbow", description: "Earn your first rainbow point", requirement: 1, unlocked: false, icon: "🌈" },
+                { id: 2, name: "Rainbow Builder", description: "Earn 100 rainbow points", requirement: 100, unlocked: false, icon: "✨" },
+                { id: 3, name: "Rainbow Master", description: "Earn 1,000 rainbow points", requirement: 1000, unlocked: false, icon: "🌟" },
+                { id: 4, name: "Rainbow Billionaire", description: "Earn 10,000 rainbow points", requirement: 10000, unlocked: false, icon: "💎" },
+                { id: 5, name: "Click Master", description: "Reach 100 points per click", requirement: 100, type: "click", unlocked: false, icon: "👆" },
+                { id: 6, name: "Auto Rainbow", description: "Generate 100 points per second", requirement: 100, type: "auto", unlocked: false, icon: "⚡" }
+            ]
+        };
+
+        // DOM Elements
+        const pointsElement = document.getElementById('points');
+        const perClickElement = document.getElementById('perClick');
+        const perSecondElement = document.getElementById('perSecond');
+        const clickValueElement = document.getElementById('clickValue');
+        const clickArea = document.getElementById('clickArea');
+        const upgradeList = document.getElementById('upgradeList');
+        const achievementList = document.getElementById('achievementList');
+        const notification = document.getElementById('notification');
+
+        // Initialize game
+        function initGame() {
+            renderUpgrades();
+            renderAchievements();
+            setupEventListeners();
+            startGameLoop();
+        }
+
+        // Render upgrades
+        function renderUpgrades() {
+            upgradeList.innerHTML = '';
+            gameState.upgrades.forEach(upgrade => {
+                const upgradeElement = document.createElement('div');
+                upgradeElement.className = `upgrade ${gameState.points >= upgrade.cost ? '' : 'disabled'}`;
+                upgradeElement.innerHTML = `
+                    <h3>${upgrade.name}</h3>
+                    <p>${upgrade.description}</p>
+                    <p>Cost: <span class="cost">${upgrade.cost}</span> points</p>
+                `;
+                upgradeElement.addEventListener('click', () => purchaseUpgrade(upgrade));
+                upgradeList.appendChild(upgradeElement);
+            });
+        }
+
+        // Render achievements
+        function renderAchievements() {
+            achievementList.innerHTML = '';
+            gameState.achievements.forEach(achievement => {
+                const achievementElement = document.createElement('div');
+                achievementElement.className = `achievement ${achievement.unlocked ? 'unlocked' : ''}`;
+                achievementElement.innerHTML = `
+                    ${achievement.unlocked ? achievement.icon : '?'}
+                    <div class="tooltip">${achievement.name}: ${achievement.description}</div>
+                `;
+                achievementList.appendChild(achievementElement);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            clickArea.addEventListener('click', handleClick);
+        }
+
+        // Handle click
+        function handleClick() {
+            addPoints(gameState.perClick);
+            createParticles();
+            updateClickValue();
+        }
+
+        // Add points
+        function addPoints(amount) {
+            gameState.points += amount;
+            updateUI();
+            checkAchievements();
+        }
+
+        // Purchase upgrade
+        function purchaseUpgrade(upgrade) {
+            if (gameState.points >= upgrade.cost) {
+                gameState.points -= upgrade.cost;
+                
+                if (upgrade.type === "click") {
+                    gameState.perClick += upgrade.value;
+                } else if (upgrade.type === "auto") {
+                    gameState.perSecond += upgrade.value;
+                }
+                
+                // Increase cost for next purchase (balatro-style scaling)
+                upgrade.cost = Math.floor(upgrade.cost * 1.5);
+                
+                updateUI();
+                renderUpgrades();
+                showNotification(`Purchased: ${upgrade.name}!`);
+            }
+        }
+
+        // Create particles
+        function createParticles() {
+            const particlesContainer = document.createElement('div');
+            particlesContainer.className = 'particles';
+            document.body.appendChild(particlesContainer);
+            
+            const colors = ['#ff0000', '#ff8000', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#8b00ff'];
+            
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.width = `${Math.random() * 10 + 5}px`;
+                particle.style.height = particle.style.width;
+                particlesContainer.appendChild(particle);
+                
+                // Animate particle
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 100 + 50;
+                const duration = Math.random() * 1000 + 500;
+                
+                particle.animate([
+                    { transform: 'translate(0, 0)', opacity: 1 },
+                    { transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`, opacity: 0 }
+                ], {
+                    duration: duration,
+                    easing: 'ease-out'
+                });
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, duration);
+            }
+            
+            setTimeout(() => {
+                particlesContainer.remove();
+            }, 1500);
+        }
+
+        // Update click value display
+        function updateClickValue() {
+            clickValueElement.textContent = gameState.perClick;
+        }
+
+        // Check achievements
+        function checkAchievements() {
+            let newAchievement = false;
+            
+            gameState.achievements.forEach(achievement => {
+                if (!achievement.unlocked) {
+                    if (achievement.type === "click" && gameState.perClick >= achievement.requirement) {
+                        achievement.unlocked = true;
+                        newAchievement = true;
+                    } else if (achievement.type === "auto" && gameState.perSecond >= achievement.requirement) {
+                        achievement.unlocked = true;
+                        newAchievement = true;
+                    } else if (!achievement.type && gameState.points >= achievement.requirement) {
+                        achievement.unlocked = true;
+                        newAchievement = true;
+                    }
+                }
+            });
+            
+            if (newAchievement) {
+                renderAchievements();
+                showNotification("Achievement Unlocked!");
+            }
+        }
+
+        // Show notification
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Update UI
+        function updateUI() {
+            pointsElement.textContent = Math.floor(gameState.points);
+            perClickElement.textContent = gameState.perClick;
+            perSecondElement.textContent = gameState.perSecond;
+            clickValueElement.textContent = gameState.perClick;
+            
+            // Update upgrade buttons
+            const upgradeElements = document.querySelectorAll('.upgrade');
+            upgradeElements.forEach((element, index) => {
+                if (gameState.points >= gameState.upgrades[index].cost) {
+                    element.classList.remove('disabled');
+                } else {
+                    element.classList.add('disabled');
+                }
+            });
+        }
+
+        // Game loop
+        function startGameLoop() {
+            setInterval(() => {
+                if (gameState.perSecond > 0) {
+                    addPoints(gameState.perSecond / 10);
+                }
+            }, 100);
+        }
+
+        // Initialize the game
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>
