@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#8b00ff">
+    <title>Cosmic Crystal Defenders - Epic SVG Tower Defense</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Audiowide&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="music-player.css">
+</head>
+<body>
+    <!-- Animated SVG Background -->
+    <div class="cosmic-background">
+        <svg class="stars-layer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+            <defs>
+                <radialGradient id="starGradient">
+                    <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+                    <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+                </radialGradient>
+                <filter id="glow">
+                    <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                    <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+            </defs>
+            <g class="star-field"></g>
+        </svg>
+        
+        <svg class="nebula-layer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+            <defs>
+                <linearGradient id="nebula1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#ff00ff" stop-opacity="0.2">
+                        <animate attributeName="stop-color" values="#ff00ff;#00ffff;#ff00ff" dur="10s" repeatCount="indefinite"/>
+                    </stop>
+                    <stop offset="100%" stop-color="#00ffff" stop-opacity="0.1">
+                        <animate attributeName="stop-color" values="#00ffff;#ff00ff;#00ffff" dur="10s" repeatCount="indefinite"/>
+                    </stop>
+                </linearGradient>
+            </defs>
+            <ellipse cx="960" cy="540" rx="600" ry="300" fill="url(#nebula1)" transform="rotate(45 960 540)">
+                <animateTransform attributeName="transform" type="rotate" from="0 960 540" to="360 960 540" dur="120s" repeatCount="indefinite"/>
+            </ellipse>
+        </svg>
+    </div>
+
+    <!-- Main Game Container -->
+    <div class="game-wrapper">
+        <!-- Full-width Wave Display -->
+        <div class="wave-display-top">
+            <div class="wave-progress-container">
+                <div class="wave-info">
+                    <span class="wave-label">WAVE</span>
+                    <span id="waveNumber" class="wave-number">1</span>
+                </div>
+                <div class="wave-progress-bar">
+                    <div id="waveProgress" class="wave-progress-fill"></div>
+                </div>
+                <div class="wave-status">
+                    <span id="enemiesRemaining">0</span>
+                    <span class="wave-status-label">ENEMIES</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-container">
+            <!-- Multi-layer Canvas System -->
+            <div class="canvas-stack">
+                <canvas id="backgroundCanvas" class="game-canvas"></canvas>
+                <canvas id="gameCanvas" class="game-canvas"></canvas>
+                <canvas id="effectsCanvas" class="game-canvas"></canvas>
+                <canvas id="uiCanvas" class="game-canvas"></canvas>
+                
+                <!-- SVG Overlay for Complex Graphics -->
+                <svg id="svgOverlay" class="svg-overlay" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <!-- Crystal Gradient -->
+                        <radialGradient id="crystalGradient">
+                            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+                            <stop offset="50%" stop-color="#00ffff" stop-opacity="0.6"/>
+                            <stop offset="100%" stop-color="#0088ff" stop-opacity="0.3"/>
+                        </radialGradient>
+                        
+                        <!-- Shield Effect -->
+                        <radialGradient id="shieldGradient">
+                            <stop offset="0%" stop-color="#00ff00" stop-opacity="0"/>
+                            <stop offset="70%" stop-color="#00ff88" stop-opacity="0.3"/>
+                            <stop offset="100%" stop-color="#00ffff" stop-opacity="0.8"/>
+                        </radialGradient>
+                        
+                        <!-- Explosion Pattern -->
+                        <pattern id="explosionPattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                            <circle cx="50" cy="50" r="40" fill="#ff6600" opacity="0.5">
+                                <animate attributeName="r" values="10;40;10" dur="2s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                        </pattern>
+                    </defs>
+                    
+                <!-- Dynamic SVG Elements Will Be Added Here -->
+                <g id="svgCrystals"></g>
+                <g id="svgTowers"></g>
+                <g id="svgEnemies"></g>
+                <g id="svgEffects"></g>
+            </svg>
+            
+            <!-- Toast Notification Container -->
+            <div id="toastContainer" class="toast-container"></div>
+        </div>
+
+            <!-- Advanced HUD System -->
+            <div class="hud-overlay">
+                <!-- Top HUD -->
+                <div class="hud-top">
+                    <div class="resource-panel">
+                        <div class="resource-item">
+                            <svg width="30" height="30" class="resource-icon">
+                                <polygon points="15,5 25,15 15,25 5,15" fill="#00ffff" stroke="#ffffff" stroke-width="2"/>
+                            </svg>
+                            <span class="resource-label">💎</span>
+                            <span id="crystalCount" class="resource-value">1000</span>
+                        </div>
+                        <div class="resource-item">
+                            <span class="resource-label">🔬</span>
+                            <span id="techCount" class="resource-value">0</span>
+                        </div>
+                        <div class="resource-item">
+                            <span class="resource-label">✦</span>
+                            <span id="essenceCount" class="resource-value">0</span>
+                        </div>
+                        <div class="resource-item">
+                            <span class="resource-label">◆</span>
+                            <span id="fragmentCount" class="resource-value">0</span>
+                        </div>
+                        <div class="resource-item">
+                            <span class="resource-label">⬢</span>
+                            <span id="coreCount" class="resource-value">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Side Panels -->
+                <div class="right-side-panels">
+                    <div class="score-display">
+                        <div class="score-label">SCORE</div>
+                        <div id="scoreValue" class="score-value">0</div>
+                        <div class="multiplier">x<span id="multiplier">1</span></div>
+                    </div>
+                    
+                    <!-- Game Stats Panel -->
+                    <div class="game-stats-panel">
+                        <h3 class="stats-title">MISSION STATUS</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item-compact">
+                                <span class="stat-icon">🎯</span>
+                                <div class="stat-details">
+                                    <span class="stat-label">Score</span>
+                                    <span id="gameScore" class="stat-value">0</span>
+                                </div>
+                            </div>
+                            <div class="stat-item-compact">
+                                <span class="stat-icon">💀</span>
+                                <div class="stat-details">
+                                    <span class="stat-label">Eliminated</span>
+                                    <span id="gameEnemiesKilled" class="stat-value">0</span>
+                                </div>
+                            </div>
+                            <div class="stat-item-compact">
+                                <span class="stat-icon">🏗️</span>
+                                <div class="stat-details">
+                                    <span class="stat-label">Built</span>
+                                    <span id="gameTowersBuilt" class="stat-value">0</span>
+                                </div>
+                            </div>
+                            <div class="stat-item-compact">
+                                <span class="stat-icon">⚡</span>
+                                <div class="stat-details">
+                                    <span class="stat-label">DPS</span>
+                                    <span id="gameDPS" class="stat-value">0</span>
+                                </div>
+                            </div>
+                            <div class="stat-item-compact">
+                                <span class="stat-icon">🌊</span>
+                                <div class="stat-details">
+                                    <span class="stat-label">Wave</span>
+                                    <span id="gameWave" class="stat-value">1</span>
+                                </div>
+                            </div>
+                            <div class="stat-item-compact">
+                                <span class="stat-icon">⏱️</span>
+                                <div class="stat-details">
+                                    <span class="stat-label">Time</span>
+                                    <span id="gameTime" class="stat-value">0:00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enhanced Defense Panel -->
+                <div class="defense-panel-expanded">
+                    <div class="defense-header">
+                        <h3 class="panel-title">DEFENSES</h3>
+                        <button id="skillTreeToggle" class="upgrade-toggle-btn" title="Open Upgrades">⚡</button>
+                    </div>
+                    
+                    <div class="tower-grid-expanded">
+                        <!-- Laser Tower -->
+                        <div class="tower-card" data-tower="laser">
+                            <svg class="tower-preview" width="60" height="60">
+                                <rect x="20" y="40" width="20" height="15" fill="#666"/>
+                                <circle cx="30" cy="30" r="15" fill="#0088ff" stroke="#00ffff" stroke-width="2"/>
+                                <line x1="30" y1="15" x2="30" y2="5" stroke="#00ffff" stroke-width="3"/>
+                            </svg>
+                            <div class="tower-info">
+                                <div class="tower-name">Laser</div>
+                                <div class="tower-cost">💎 100</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Missile Tower -->
+                        <div class="tower-card" data-tower="missile">
+                            <svg class="tower-preview" width="60" height="60">
+                                <rect x="15" y="35" width="30" height="20" fill="#888"/>
+                                <polygon points="30,10 40,30 20,30" fill="#ff6600" stroke="#ffaa00" stroke-width="2"/>
+                            </svg>
+                            <div class="tower-info">
+                                <div class="tower-name">Missile</div>
+                                <div class="tower-cost">💎 200</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Plasma Tower -->
+                        <div class="tower-card" data-tower="plasma">
+                            <svg class="tower-preview" width="60" height="60">
+                                <hexagon cx="30" cy="30" r="20" fill="#ff00ff" stroke="#ff88ff" stroke-width="2"/>
+                                <circle cx="30" cy="30" r="8" fill="#ffffff"/>
+                            </svg>
+                            <div class="tower-info">
+                                <div class="tower-name">Plasma</div>
+                                <div class="tower-cost">💎 350</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tesla Tower -->
+                        <div class="tower-card" data-tower="tesla">
+                            <svg class="tower-preview" width="60" height="60">
+                                <rect x="25" y="35" width="10" height="20" fill="#999"/>
+                                <circle cx="30" cy="25" r="15" fill="none" stroke="#ffff00" stroke-width="3"/>
+                                <circle cx="30" cy="25" r="10" fill="none" stroke="#ffff00" stroke-width="2"/>
+                                <circle cx="30" cy="25" r="5" fill="#ffffff"/>
+                            </svg>
+                            <div class="tower-info">
+                                <div class="tower-name">Tesla</div>
+                                <div class="tower-cost">💎 500</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ability-section">
+                        <h3 class="panel-title">ABILITIES</h3>
+                        <div class="ability-grid">
+                            <button class="ability-btn" id="ability-freeze" data-cooldown="10">
+                                <svg width="40" height="40">
+                                    <polygon points="20,5 30,20 20,35 10,20" fill="#00ffff" opacity="0.8"/>
+                                    <polygon points="20,10 25,20 20,30 15,20" fill="#ffffff"/>
+                                </svg>
+                                <div class="cooldown-overlay"></div>
+                            </button>
+                            <button class="ability-btn" id="ability-bomb" data-cooldown="15">
+                                <svg width="40" height="40">
+                                    <circle cx="20" cy="20" r="15" fill="#ff6600" opacity="0.8"/>
+                                    <circle cx="20" cy="20" r="8" fill="#ffff00"/>
+                                </svg>
+                                <div class="cooldown-overlay"></div>
+                            </button>
+                            <button class="ability-btn" id="ability-boost" data-cooldown="20">
+                                <svg width="40" height="40">
+                                    <polygon points="20,5 35,35 5,35" fill="#00ff00" opacity="0.8"/>
+                                    <polygon points="20,15 27,30 13,30" fill="#ffffff"/>
+                                </svg>
+                                <div class="cooldown-overlay"></div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom HUD - Stats and Upgrades -->
+                <div class="hud-bottom">
+                    <div class="stats-panel">
+                        <div class="stat-item">
+                            <span class="stat-label">Enemies Defeated:</span>
+                            <span id="enemiesDefeated" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Towers Built:</span>
+                            <span id="towersBuilt" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Crystals Harvested:</span>
+                            <span id="crystalsHarvested" class="stat-value">0</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Music Player (Winamp Style) -->
+                    <div class="music-player">
+                        <div class="player-display">
+                            <div class="player-title">♪ COSMIC JUKEBOX ♪</div>
+                            <div class="track-info">
+                                <div class="track-number">TRACK <span id="trackNumber">01</span>/12</div>
+                                <div class="track-name" id="trackName">Cosmic Drift</div>
+                                <div class="track-time">
+                                    <span id="trackTime">0:00</span> / <span id="trackDuration">∞</span>
+                                </div>
+                            </div>
+                            <div class="visualizer">
+                                <div class="bar" style="animation-delay: 0ms"></div>
+                                <div class="bar" style="animation-delay: 50ms"></div>
+                                <div class="bar" style="animation-delay: 100ms"></div>
+                                <div class="bar" style="animation-delay: 150ms"></div>
+                                <div class="bar" style="animation-delay: 200ms"></div>
+                                <div class="bar" style="animation-delay: 250ms"></div>
+                                <div class="bar" style="animation-delay: 300ms"></div>
+                                <div class="bar" style="animation-delay: 350ms"></div>
+                                <div class="bar" style="animation-delay: 400ms"></div>
+                                <div class="bar" style="animation-delay: 450ms"></div>
+                            </div>
+                        </div>
+                        <div class="player-controls">
+                            <button class="player-btn" id="prevTrack" title="Previous Track">⏮</button>
+                            <button class="player-btn" id="playPause" title="Play/Pause">▶</button>
+                            <button class="player-btn" id="nextTrack" title="Next Track">⏭</button>
+                            <button class="player-btn" id="shuffleBtn" title="Shuffle">🔀</button>
+                            <button class="player-btn" id="repeatBtn" title="Repeat">🔁</button>
+                        </div>
+                        <div class="volume-controls">
+                            <div class="volume-group">
+                                <label class="volume-label">🎵</label>
+                                <input type="range" id="musicVolume" class="volume-slider" min="0" max="100" value="30">
+                                <span class="volume-value" id="musicVolumeValue">30%</span>
+                                <button class="mute-btn" id="muteMusic" title="Mute Music">🔇</button>
+                            </div>
+                            <div class="volume-group">
+                                <label class="volume-label">🔊</label>
+                                <input type="range" id="sfxVolume" class="volume-slider" min="0" max="100" value="50">
+                                <span class="volume-value" id="sfxVolumeValue">50%</span>
+                                <button class="mute-btn" id="muteSFX" title="Mute SFX">🔇</button>
+                            </div>
+                        </div>
+                        <div class="track-list-toggle">
+                            <button id="trackListBtn" class="track-list-btn">📋 Playlist</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Track List Popup -->
+                    <div id="trackListPopup" class="track-list-popup" style="display: none;">
+                        <div class="track-list-header">
+                            <span>PLAYLIST</span>
+                            <button class="close-btn" id="closeTrackList">×</button>
+                        </div>
+                        <div class="track-list-content">
+                            <div class="track-item" data-track="0">
+                                <span class="track-num">01.</span>
+                                <span class="track-title">Cosmic Drift</span>
+                                <span class="track-genre">[ambient]</span>
+                            </div>
+                            <div class="track-item" data-track="1">
+                                <span class="track-num">02.</span>
+                                <span class="track-title">Nebula Dreams</span>
+                                <span class="track-genre">[ethereal]</span>
+                            </div>
+                            <div class="track-item" data-track="2">
+                                <span class="track-num">03.</span>
+                                <span class="track-title">Asteroid Belt</span>
+                                <span class="track-genre">[techno]</span>
+                            </div>
+                            <div class="track-item" data-track="3">
+                                <span class="track-num">04.</span>
+                                <span class="track-title">Solar Winds</span>
+                                <span class="track-genre">[chillwave]</span>
+                            </div>
+                            <div class="track-item" data-track="4">
+                                <span class="track-num">05.</span>
+                                <span class="track-title">Dark Matter</span>
+                                <span class="track-genre">[darkwave]</span>
+                            </div>
+                            <div class="track-item" data-track="5">
+                                <span class="track-num">06.</span>
+                                <span class="track-title">Plasma Storm</span>
+                                <span class="track-genre">[dnb]</span>
+                            </div>
+                            <div class="track-item" data-track="6">
+                                <span class="track-num">07.</span>
+                                <span class="track-title">Quantum Echo</span>
+                                <span class="track-genre">[glitch]</span>
+                            </div>
+                            <div class="track-item" data-track="7">
+                                <span class="track-num">08.</span>
+                                <span class="track-title">Gravity Well</span>
+                                <span class="track-genre">[dubstep]</span>
+                            </div>
+                            <div class="track-item" data-track="8">
+                                <span class="track-num">09.</span>
+                                <span class="track-title">Stellar Voyage</span>
+                                <span class="track-genre">[synthwave]</span>
+                            </div>
+                            <div class="track-item" data-track="9">
+                                <span class="track-num">10.</span>
+                                <span class="track-title">Ion Drive</span>
+                                <span class="track-genre">[industrial]</span>
+                            </div>
+                            <div class="track-item" data-track="10">
+                                <span class="track-num">11.</span>
+                                <span class="track-title">Warp Field</span>
+                                <span class="track-genre">[psytrance]</span>
+                            </div>
+                            <div class="track-item" data-track="11">
+                                <span class="track-num">12.</span>
+                                <span class="track-title">Zero Gravity</span>
+                                <span class="track-genre">[lofi]</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="upgrade-quick-access">
+                        <button class="upgrade-btn" id="upgradeSpeed">Speed +</button>
+                        <button class="upgrade-btn" id="upgradeDamage">Damage +</button>
+                        <button class="upgrade-btn" id="upgradeRange">Range +</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menu Overlays -->
+            <div id="pauseMenu" class="menu-overlay" style="display: none;">
+                <div class="menu-content">
+                    <h2 class="menu-title">PAUSED</h2>
+                    <button class="menu-btn" id="resumeBtn">Resume</button>
+                    <button class="menu-btn" id="restartBtn">Restart</button>
+                    <button class="menu-btn" id="settingsBtn">Settings</button>
+                    <button class="menu-btn" id="quitBtn">Quit</button>
+                </div>
+            </div>
+
+            <div id="gameOverMenu" class="menu-overlay" style="display: none;">
+                <div class="menu-content">
+                    <h2 class="menu-title">GAME OVER</h2>
+                    <div class="final-stats">
+                        <div class="stat-row">
+                            <span>Final Score:</span>
+                            <span id="finalScore">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>Waves Survived:</span>
+                            <span id="wavesSurvived">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>Time Played:</span>
+                            <span id="timePlayed">00:00</span>
+                        </div>
+                    </div>
+                    <button class="menu-btn" id="retryBtn">Try Again</button>
+                    <button class="menu-btn" id="mainMenuBtn">Main Menu</button>
+                </div>
+            </div>
+
+            <!-- Tutorial Overlay -->
+            <div id="tutorialOverlay" class="tutorial-overlay">
+                <div class="tutorial-content">
+                    <h3>Welcome Commander!</h3>
+                    <p>Defend your base from cosmic invaders!</p>
+                    <ul>
+                        <li>🖱️ Click to place towers</li>
+                        <li>⚡ Collect crystals for resources</li>
+                        <li>🎯 Upgrade towers for more power</li>
+                        <li>🚀 Use abilities wisely</li>
+                    </ul>
+                    <button id="startGameBtn" class="start-btn">Start Mission</button>
+                </div>
+            </div>
+
+            <!-- Performance Monitor -->
+            <div class="performance-monitor">
+                <div class="perf-item">FPS: <span id="fps">60</span></div>
+                <div class="perf-item">Entities: <span id="entityCount">0</span></div>
+                <div class="perf-item">Particles: <span id="particleCount">0</span></div>
+            </div>
+        </div>
+
+        <!-- Tower Tooltip (follows mouse) -->
+        <div id="towerTooltip" class="tower-tooltip">
+            <div class="tower-tooltip-title" id="tooltipTitle">Tower Name</div>
+            <div class="tower-tooltip-stat">
+                <span>Level:</span>
+                <span id="tooltipLevel">1</span>
+            </div>
+            <div class="tower-tooltip-stat">
+                <span>Kills:</span>
+                <span id="tooltipKills">0</span>
+            </div>
+            <div class="tower-tooltip-stat">
+                <span>Damage:</span>
+                <span id="tooltipDamage">0</span>
+            </div>
+            <div class="tower-tooltip-stat">
+                <span>Range:</span>
+                <span id="tooltipRange">0</span>
+            </div>
+            <div class="tower-tooltip-stat">
+                <span>Fire Rate:</span>
+                <span id="tooltipFireRate">0</span>
+            </div>
+            <div class="tower-tooltip-stat">
+                <span>Total Damage:</span>
+                <span id="tooltipTotalDamage">0</span>
+            </div>
+            <div class="tower-tooltip-stat">
+                <span>XP:</span>
+                <span id="tooltipXP">0/100</span>
+            </div>
+            <div class="tower-tooltip-xp-bar">
+                <div class="tower-tooltip-xp-fill" id="tooltipXPBar" style="width: 0%"></div>
+            </div>
+            <div class="tower-tooltip-stat">
+                <span>Skill Points:</span>
+                <span id="tooltipSkillPoints">0</span>
+            </div>
+        </div>
+
+        <!-- Tower Info Panel (Hidden by default) -->
+        <div id="towerInfoPanel" class="tower-info-panel" style="display: none;">
+            <button class="close-btn" onclick="closeTowerInfo()">×</button>
+            <h3 id="towerTitle">Tower Name</h3>
+            <input type="text" id="towerNameInput" placeholder="Name your tower..." maxlength="20">
+            <div class="tower-stats">
+                <div class="stat">Level: <span id="towerLevel">1</span></div>
+                <div class="stat">XP: <span id="towerXP">0/100</span></div>
+                <div class="stat">Kills: <span id="towerKills">0</span></div>
+                <div class="stat">Damage: <span id="towerDamage">0</span></div>
+                <div class="stat">Skill Points: <span id="towerSkillPoints">0</span></div>
+            </div>
+            <div class="skill-tree">
+                <h4>Skills</h4>
+                <div class="skill-row">
+                    <button class="skill-btn" onclick="upgradeTowerSkill('damage')">
+                        <span class="skill-icon">⚔️</span>
+                        <span class="skill-level" id="skill-damage">0/10</span>
+                    </button>
+                    <button class="skill-btn" onclick="upgradeTowerSkill('range')">
+                        <span class="skill-icon">🎯</span>
+                        <span class="skill-level" id="skill-range">0/10</span>
+                    </button>
+                </div>
+                <div class="skill-row">
+                    <button class="skill-btn" onclick="upgradeTowerSkill('fireRate')">
+                        <span class="skill-icon">⚡</span>
+                        <span class="skill-level" id="skill-fireRate">0/10</span>
+                    </button>
+                    <button class="skill-btn" onclick="upgradeTowerSkill('special')">
+                        <span class="skill-icon">✨</span>
+                        <span class="skill-level" id="skill-special">0/5</span>
+                    </button>
+                </div>
+            </div>
+            <div class="tower-actions">
+                <button class="action-btn sell-btn" onclick="sellSelectedTower()">Sell Tower</button>
+            </div>
+        </div>
+
+        <!-- Global Skill Tree Panel -->
+        <div id="globalSkillTree" class="global-skill-tree" style="display: none;">
+            <button class="close-btn" onclick="closeGlobalSkillTree()">×</button>
+            <h2>Tower Research</h2>
+            <div class="research-grid">
+                <!-- Unlockable towers will be shown here -->
+            </div>
+        </div>
+
+        <!-- Controls Legend -->
+        <div class="controls-legend">
+            <div class="control-group">
+                <kbd>Click</kbd> Place Tower
+            </div>
+            <div class="control-group">
+                <kbd>Right Click</kbd> Cancel/Sell
+            </div>
+            <div class="control-group">
+                <kbd>Space</kbd> Pause
+            </div>
+            <div class="control-group">
+                <kbd>1-4</kbd> Select Tower
+            </div>
+            <div class="control-group">
+                <kbd>Q/W/E</kbd> Abilities
+            </div>
+            <div class="control-group">
+                <kbd>Shift</kbd> Fast Forward
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="bgMusic" loop>
+        <source src="audio/cosmic-theme.ogg" type="audio/ogg">
+    </audio>
+    <audio id="sfxPool"></audio>
+
+    <!-- Load Game Scripts -->
+    <script src="script.js"></script>
+    <script src="music-controls.js"></script>
+    <script src="toast-system.js"></script>
+    <script src="stats-updater.js"></script>
+    <script src="enhanced-ai.js"></script>
+    <script src="debug-music.js"></script>
+</body>
+</html>

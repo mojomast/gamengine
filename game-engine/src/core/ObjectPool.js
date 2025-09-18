@@ -67,6 +67,7 @@ class ParticlePool extends ObjectPool {
         super(
             () => ({
                 position: { x: 0, y: 0 },
+                startPosition: { x: 0, y: 0 },
                 velocity: { x: 0, y: 0 },
                 acceleration: { x: 0, y: 0 },
                 life: 1000,
@@ -146,7 +147,66 @@ class TweenPool extends ObjectPool {
                 isReversed: false,
                 onStart: null,
                 onUpdate: null,
-                onComplete: null
+                onComplete: null,
+                
+                // Add utility methods directly to each tween object
+                getNestedProperty(obj, path) {
+                    return path.split('.').reduce((current, key) => current && current[key], obj);
+                },
+
+                setNestedProperty(obj, path, value) {
+                    const keys = path.split('.');
+                    const lastKey = keys.pop();
+                    const target = keys.reduce((current, key) => current && current[key], obj);
+                    if (target) {
+                        target[lastKey] = value;
+                    }
+                },
+
+                update(deltaTime) {
+                    if (this.completed) return false;
+
+                    this.elapsed += deltaTime * 1000;
+
+                    if (this.elapsed < 0) return true; // Handle delay if needed
+
+                    if (!this.started) {
+                        this.started = true;
+                        if (this.onStart) this.onStart(this.target);
+                    }
+
+                    const progress = Math.min(this.elapsed / this.duration, 1);
+                    const easedProgress = progress; // Linear for now, can be extended
+
+                    for (const prop in this.properties) {
+                        const start = this.isReversed ? this.endValues[prop] : this.startValues[prop];
+                        const end = this.isReversed ? this.startValues[prop] : this.endValues[prop];
+                        const current = start + (end - start) * easedProgress;
+                        this.setNestedProperty(this.target, prop, current);
+                    }
+
+                    if (this.onUpdate) this.onUpdate(this.target, easedProgress);
+
+                    if (this.elapsed >= this.duration) {
+                        this.completed = true;
+                        if (this.onComplete) this.onComplete(this.target);
+                        return false;
+                    }
+
+                    return true;
+                },
+
+                stop() {
+                    this.completed = true;
+                },
+
+                reset() {
+                    this.elapsed = 0;
+                    this.completed = false;
+                    this.started = false;
+                    this.currentRepeat = 0;
+                    this.isReversed = false;
+                }
             }),
             (tween, target, properties, duration, options = {}) => {
                 tween.target = target;
@@ -172,71 +232,5 @@ class TweenPool extends ObjectPool {
         );
     }
 }
-
-// Add utility methods to pooled tween
-Object.assign(TweenPool.prototype.pool[0] || {}, {
-    getNestedProperty(obj, path) {
-        return path.split('.').reduce((current, key) => current && current[key], obj);
-    },
-
-    setNestedProperty(obj, path, value) {
-        const keys = path.split('.');
-        const lastKey = keys.pop();
-        const target = keys.reduce((current, key) => current && current[key], obj);
-        if (target) {
-            target[lastKey] = value;
-        }
-    },
-
-    update(deltaTime) {
-        if (this.completed) return false;
-
-        this.elapsed += deltaTime * 1000;
-
-        if (this.elapsed < 0) return true; // Handle delay if needed
-
-        if (!this.started) {
-            this.started = true;
-            if (this.onStart) this.onStart(this.target);
-        }
-
-        const progress = Math.min(this.elapsed / this.duration, 1);
-        const easedProgress = progress; // Linear for now, can be extended
-
-        for (const prop in this.properties) {
-            const start = this.isReversed ? this.endValues[prop] : this.startValues[prop];
-            const end = this.isReversed ? this.startValues[prop] : this.endValues[prop];
-            const current = start + (end - start) * easedProgress;
-            this.setNestedProperty(this.target, prop, current);
-        }
-
-        if (this.onUpdate) this.onUpdate(this.target, easedProgress);
-
-        if (this.elapsed >= this.duration) {
-            this.completed = true;
-            if (this.onComplete) this.onComplete(this.target);
-            return false;
-        }
-
-        return true;
-    },
-
-    stop() {
-        this.completed = true;
-    },
-
-    reset() {
-        this.elapsed = 0;
-        this.completed = false;
-        this.started = false;
-        this.currentRepeat = 0;
-        this.isReversed = false;
-    }
-});
-
-// Add the same methods to all pooled tweens
-TweenPool.prototype.pool.forEach(tween => {
-    Object.assign(tween, TweenPool.prototype.pool[0]);
-});
 
 export { ObjectPool, ParticlePool, TweenPool };

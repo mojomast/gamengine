@@ -1,0 +1,106 @@
+/* Additional styles for Bingolotro game effects */
+
+/* Particle and animation enhancements */
+@keyframes sparkle {
+    0% { transform: scale(0) rotate(0deg); opacity: 1; }
+    50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
+    100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+
+@keyframes bingoWin {
+    0% { transform: scale(1); background-color: #27ae60; }
+    25% { transform: scale(1.1); background-color: #f39c12; }
+    50% { transform: scale(1.2); background-color: #e94560; }
+    75% { transform: scale(1.1); background-color: #8e44ad; }
+    100% { transform: scale(1); background-color: #27ae60; }
+}
+
+.bingo-win-animation {
+    animation: bingoWin 1s ease-in-out 3;
+}
+
+.joker-activate {
+    animation: sparkle 0.5s ease-out;
+}
+
+/* Enhanced responsive design */
+@media (max-width: 480px) {
+    .ui-panel {
+        padding: 10px;
+    }
+    
+    .panel-section {
+        padding: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .joker-card {
+        padding: 8px;
+        margin-bottom: 6px;
+    }
+    
+    .btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+}
+
+/* High DPI display optimization */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    #gameCanvas {
+        image-rendering: pixelated;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: linear-gradient(45deg, #0f0f23, #0a0a1e);
+    }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    .joker-card,
+    .btn {
+        transition: none;
+    }
+    
+    .joker-card:hover,
+    .btn:hover {
+        transform: none;
+    }
+}
+
+/* Focus indicators for keyboard navigation */
+.joker-card:focus,
+.btn:focus {
+    outline: 3px solid #f39c12;
+    outline-offset: 2px;
+}
+
+/* Loading state styles */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f39c12;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

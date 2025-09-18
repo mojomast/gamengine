@@ -1,0 +1,332 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vampire Saviors - Dark Stalkers Fighting Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a0033, #330066, #000000);
+            color: #ffffff;
+            font-family: 'Press Start 2P', monospace;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            max-width: 1920px;
+            max-height: 1080px;
+            background: radial-gradient(ellipse at center, #2d0a4d 0%, #1a0033 100%);
+            border: 3px solid #9900ff;
+            box-shadow: 0 0 30px #9900ff, inset 0 0 30px rgba(153, 0, 255, 0.3);
+        }
+
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+
+        .hud-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .health-bars {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .player-hud {
+            width: 400px;
+        }
+
+        .player-name {
+            font-size: 16px;
+            color: #ffff00;
+            text-shadow: 2px 2px 0 #000000;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .health-container {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ffff00;
+            padding: 5px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .health-bar {
+            height: 25px;
+            background: linear-gradient(to right, #ff0000 0%, #ffff00 50%, #00ff00 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .health-damage {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            transition: width 0.3s ease;
+        }
+
+        .meter-bar {
+            height: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ffff;
+            margin-top: 5px;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(to right, #0066ff, #00ffff);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .round-timer {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: #ffff00;
+            text-shadow: 2px 2px 0 #000000;
+        }
+
+        .combo-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: #ff6600;
+            text-shadow: 3px 3px 0 #000000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .input-display {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .player-inputs {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #9900ff;
+            padding: 10px;
+            min-width: 200px;
+        }
+
+        .controls-help {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid #9900ff;
+            padding: 20px;
+            font-size: 12px;
+            line-height: 1.5;
+            display: none;
+        }
+
+        .menu-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+        }
+
+        .menu-title {
+            font-family: 'Creepster', cursive;
+            font-size: 48px;
+            color: #9900ff;
+            text-shadow: 0 0 20px #9900ff;
+            margin-bottom: 30px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .menu-button {
+            background: linear-gradient(135deg, #330066, #9900ff);
+            border: 2px solid #ffff00;
+            color: #ffffff;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 16px;
+            padding: 15px 30px;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 2px 2px 0 #000000;
+            box-shadow: 0 0 15px rgba(153, 0, 255, 0.5);
+        }
+
+        .menu-button:hover {
+            background: linear-gradient(135deg, #9900ff, #cc00ff);
+            box-shadow: 0 0 25px rgba(153, 0, 255, 0.8);
+            transform: scale(1.05);
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #9900ff; }
+            to { text-shadow: 0 0 40px #9900ff, 0 0 60px #cc00ff; }
+        }
+
+        @keyframes damage-flash {
+            0% { background-color: rgba(255, 0, 0, 0.8); }
+            100% { background-color: transparent; }
+        }
+
+        .damage-flash {
+            animation: damage-flash 0.2s ease-out;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .special-effect {
+            position: absolute;
+            pointer-events: none;
+            z-index: 8;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 0 #000000;
+        }
+
+        @media (max-width: 768px) {
+            .player-hud { width: 300px; }
+            .player-name { font-size: 12px; }
+            .health-bar { height: 20px; }
+            .menu-title { font-size: 32px; }
+            .menu-button { font-size: 12px; padding: 10px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="1920" height="1080"></canvas>
+
+        <div class="hud-overlay">
+            <!-- Player Health Bars -->
+            <div class="health-bars">
+                <div class="player-hud">
+                    <div class="player-name" id="player1Name">MORRIGAN</div>
+                    <div class="health-container">
+                        <div class="health-bar">
+                            <div class="health-damage" id="player1Damage" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="meter-bar">
+                        <div class="meter-fill" id="player1Meter"></div>
+                    </div>
+                </div>
+
+                <div class="player-hud">
+                    <div class="player-name" id="player2Name">DEMITRI</div>
+                    <div class="health-container">
+                        <div class="health-bar">
+                            <div class="health-damage" id="player2Damage" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="meter-bar">
+                        <div class="meter-fill" id="player2Meter"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Round Timer -->
+            <div class="round-timer" id="roundTimer">99</div>
+
+            <!-- Combo Display -->
+            <div class="combo-display" id="comboDisplay"></div>
+
+            <!-- Input Display -->
+            <div class="input-display">
+                <div class="player-inputs" id="player1Inputs">
+                    <div>P1 Inputs</div>
+                </div>
+                <div class="player-inputs" id="player2Inputs">
+                    <div>P2 Inputs</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Overlay -->
+        <div class="menu-overlay" id="menuOverlay">
+            <div class="menu-title">VAMPIRE SAVIORS</div>
+            <div class="menu-title" style="font-size: 24px; margin-bottom: 40px;">THE LORD OF VAMPIRE</div>
+            <button class="menu-button" onclick="startGame()">START BATTLE</button>
+            <button class="menu-button" onclick="showCharacterSelect()">CHARACTER SELECT</button>
+            <button class="menu-button" onclick="showControls()">CONTROLS</button>
+            <button class="menu-button" onclick="showOptions()">OPTIONS</button>
+        </div>
+
+        <!-- Controls Help -->
+        <div class="controls-help" id="controlsHelp">
+            <h3 style="color: #ffff00; margin-bottom: 15px;">CONTROLS</h3>
+            <p><strong>Player 1:</strong></p>
+            <p>Movement: WASD</p>
+            <p>Light Punch: U | Medium Punch: I | Heavy Punch: O</p>
+            <p>Light Kick: J | Medium Kick: K | Heavy Kick: L</p>
+            <p>Special: Quarter Circle + Punch/Kick</p>
+            <p>Super: Double Quarter Circle + Punch/Kick</p>
+            <p>Dark Force: Two buttons of same type</p>
+            <br>
+            <p><strong>Player 2:</strong></p>
+            <p>Movement: Arrow Keys</p>
+            <p>Light Punch: Numpad 7 | Medium Punch: Numpad 8 | Heavy Punch: Numpad 9</p>
+            <p>Light Kick: Numpad 4 | Medium Kick: Numpad 5 | Heavy Kick: Numpad 6</p>
+            <br>
+            <button class="menu-button" onclick="hideControls()" style="margin-top: 20px;">BACK</button>
+        </div>
+    </div>
+
+    <script type="module" src="vampire-saviors-game.js"></script>
+</body>
+</html>

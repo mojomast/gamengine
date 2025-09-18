@@ -1,0 +1,23 @@
+{
+    "name": "Bingolotro",
+    "description": "A strategic fusion of Balatro's joker mechanics with classic Bingo gameplay",
+    "version": "1.0.0",
+    "gameType": "Card/Board Game",
+    "engine": "Game Engine Framework",
+    "features": [
+        "Balatro-style Joker system",
+        "Traditional Bingo mechanics",
+        "Multiple winning patterns",
+        "Particle effects",
+        "Strategic resource management",
+        "Progressive scoring system"
+    ],
+    "controls": {
+        "Space": "Call next number",
+        "N": "Start new game",
+        "Mouse": "Click bingo card cells and jokers"
+    },
+    "tags": ["bingo", "balatro", "strategy", "cards", "particles"],
+    "created": "2025-09-17",
+    "lastModified": "2025-09-17"
+}

@@ -4,12 +4,13 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 ## Project Overview
 
-This is a game engine development project called "slop" that provides a comprehensive framework for building web-based games. The project includes:
+This is a game engine development project called "slop" that provides a fully implemented, comprehensive framework for building web-based games. The project includes:
 
 - **Multiple HTML-based games/demos**: Poker Doom, interactive game engines, setup utilities
-- **Complete game engine architecture** with modular systems
-- **Project management tools** for save/load functionality
-- **Rich documentation** covering all engine systems
+- **Complete game engine implementation** with modular, production-ready systems
+- **Advanced features**: Performance monitoring, mobile optimizations, accessibility support, theming system
+- **Project management tools** for enhanced save/load functionality with versioning
+- **Comprehensive source code** alongside rich documentation covering all engine systems
 
 ## Common Development Commands
 
@@ -59,17 +60,25 @@ The project follows a **modular game engine architecture** with these key system
 #### Core Engine Systems
 - **GameEngine**: Main orchestrator class that manages all subsystems
 - **Scene Management**: Handle different game states (menu, gameplay, pause)
-- **Input Manager**: Unified input handling (keyboard, mouse, touch)
-- **Renderer**: Canvas-based 2D rendering system
-- **Audio Manager**: Web Audio API integration
+- **Input Manager**: Advanced unified input handling with gestures, device orientation, virtual gamepad, and input recording (keyboard, mouse, touch)
+- **Renderer**: Enhanced canvas-based 2D rendering system with batch rendering optimization
+- **Audio Manager**: Web Audio API integration with spatial audio support
+- **BatchRenderer**: Optimized batch rendering for improved performance
+- **ValidationHelpers**: Data validation utilities for game state integrity
+- **ResourceManager**: Centralized resource loading and caching system
+- **ObjectPool**: Memory-efficient object reuse system for performance
 
 #### Game Systems (Modular)
-- **Character System**: Player stats, leveling, progression (`game-engine/docs/CHARACTER-STATS.md`)
-- **Dialog System**: Conversation trees and NPC interactions (`game-engine/docs/DIALOG-SYSTEM.md`)
-- **Inventory Management**: Items, equipment, crafting (`game-engine/docs/INVENTORY-MANAGEMENT.md`)  
-- **Powers & Abilities**: Spells, skills, cooldowns (`game-engine/docs/POWERS-ABILITIES.md`)
-- **Animation System**: Tweens, particles, effects (`game-engine/docs/ANIMATION-SYSTEM.md`)
-- **UI Components**: Buttons, panels, HUD elements (`game-engine/docs/UI-ELEMENTS.md`)
+- **Character System**: Player stats, leveling, progression with enhanced stat management (`game-engine/docs/CHARACTER-STATS.md`)
+- **Dialog System**: Conversation trees and NPC interactions with branching narratives (`game-engine/docs/DIALOG-SYSTEM.md`)
+- **Inventory Management**: Items, equipment, crafting with advanced item systems (`game-engine/docs/INVENTORY-MANAGEMENT.md`)
+- **Powers & Abilities**: Spells, skills, cooldowns with ability progression (`game-engine/docs/POWERS-ABILITIES.md`)
+- **Animation System**: Advanced timelines, keyframe animations, sprite animators, visual effects, tweens, particles (`game-engine/docs/ANIMATION-SYSTEM.md`)
+- **UI Components**: Buttons, panels, HUD elements with theming and accessibility support (`game-engine/docs/UI-ELEMENTS.md`)
+- **Performance Monitoring**: Built-in system performance tracking and optimization
+- **Mobile Optimizations**: Touch controls, adaptive frame rate, power saving modes
+- **Accessibility Features**: ARIA labels, screen reader support, keyboard navigation
+- **Enhanced Save/Load System**: Comprehensive state preservation with versioning
 
 #### Integration Pattern
 All systems communicate through an **event-driven architecture**:
@@ -85,32 +94,70 @@ gameEngine.characterManager.on('level-up', (data) => {
 
 ```
 slop/
+├── .gitignore
 ├── index.html                 # Main Poker Doom game
-├── project-manager.html       # Project management interface  
+├── project-manager.html       # Project management interface
 ├── setup.html                # Setup utilities
 ├── setup-neon.html           # Alternative setup
 ├── 1.html                    # Additional demo
+├── improvements.md           # Improvement notes
+├── mobile-test.js            # Mobile testing utilities
+├── WARP.md                   # WARP development guide
 ├── js/                       # JavaScript modules
 │   ├── project-manager.js    # Project management logic
 │   ├── project-preservation.js  # Save/load system
 │   ├── project-workflow.js   # Development workflow
 │   └── project-integration.js   # System integration
-├── game-engine/              # Complete engine documentation
-│   ├── README.md            # Engine overview & examples
-│   ├── PROJECT_MANAGEMENT.md   # Save system docs
-│   ├── MASTER-ARCHITECTURE.md # Integration guide  
-│   ├── docs/                # System-specific documentation
+├── game-engine/              # Complete engine implementation and documentation
+│   ├── index.html            # Engine demo interface
+│   ├── agent.md              # Agent system documentation
+│   ├── CONTROLS-AND-FEATURES.md # Controls and features overview
+│   ├── GRAPHICS.md           # Graphics system documentation
+│   ├── INTEGRATION.md        # System integration guide
+│   ├── PROJECT_MANAGEMENT.md # Save system docs
+│   ├── SCHEMA.MD             # Data schema definitions
+│   ├── server-setup.md       # Server setup instructions
+│   ├── UI.md                 # UI system overview
+│   ├── README.md             # Engine overview & examples
+│   ├── MASTER-ARCHITECTURE.md # Integration guide
+│   ├── docs/                 # System-specific documentation
+│   │   ├── ANIMATION-SYSTEM.md
 │   │   ├── CHARACTER-STATS.md
 │   │   ├── DIALOG-SYSTEM.md
 │   │   ├── INVENTORY-MANAGEMENT.md
 │   │   ├── POWERS-ABILITIES.md
-│   │   ├── ANIMATION-SYSTEM.md
+│   │   ├── SYSTEM-INTEGRATION-EXAMPLES.md
 │   │   └── UI-ELEMENTS.md
-│   └── examples/
-│       └── NeonClickerBattle.js
+│   ├── examples/             # Example implementations
+│   │   └── NeonClickerBattle.js
+│   └── src/                  # Engine source code
+│       ├── core/             # Core engine components
+│       │   ├── AbilityManager.js
+│       │   ├── AudioManager.js
+│       │   ├── BatchRenderer.js
+│       │   ├── Character.js
+│       │   ├── EventBus.js
+│       │   ├── GameEngine.js
+│       │   ├── GameObject.js
+│       │   ├── InputManager.js
+│       │   ├── InventoryManager.js
+│       │   ├── ObjectPool.js
+│       │   ├── Renderer.js
+│       │   ├── ResourceManager.js
+│       │   ├── Scene.js
+│       │   └── ValidationHelpers.js
+│       ├── effects/          # Visual effects systems
+│       │   ├── AnimationManager.js
+│       │   └── ParticleSystem.js
+│       └── ui/               # UI management systems
+│           ├── DialogManager.js
+│           └── UIManager.js
+├── shared/                   # Shared utilities and resources
 └── *-project/               # Saved project data
-    ├── project.json        # Project metadata
-    └── script.js          # Project code
+    ├── index.html           # Project HTML
+    ├── project.json         # Project metadata
+    ├── script.js            # Project code
+    └── styles.css           # Project styles
 ```
 
 ### Key Architectural Patterns
@@ -220,10 +267,20 @@ New projects can be created from templates via the Project Manager interface, ea
 - **UI Elements**: Create components with `gameEngine.uiManager`
 
 #### Performance Considerations
-- Engine uses object pooling for particles and temporary objects
-- Frame rate management maintains consistent 60 FPS with delta time
+- Engine uses advanced object pooling (ObjectPool.js) for particles and temporary objects
+- Adaptive frame rate management with power saving modes for mobile devices
+- Comprehensive performance monitoring system tracks execution times and memory usage
 - Systems can be disabled independently for performance tuning
-- Built-in performance monitoring tracks system execution times
+- Resource management with centralized loading and caching (ResourceManager.js)
+- Batch rendering optimization for improved graphics performance (BatchRenderer.js)
+
+#### Mobile and Accessibility Development
+- Touch-optimized controls with gesture recognition and virtual gamepad support
+- Device orientation and motion input handling for immersive experiences
+- Responsive UI with adaptive layouts and accessibility features
+- ARIA labels and screen reader support for inclusive game design
+- Keyboard navigation and focus management throughout the interface
+- Mobile-specific optimizations including reduced power consumption and battery management
 
 ## Important Context
 
@@ -235,17 +292,20 @@ This is a **comprehensive game engine framework** designed for:
 - **Integration examples** (how systems work together)
 
 ### Browser Compatibility
-- Modern ES6+ JavaScript (no transpilation)
-- Canvas 2D API for rendering
-- Web Audio API for sound
-- LocalStorage for save data
-- Touch and pointer events for mobile
+- Modern ES6+ JavaScript with implemented source code (no transpilation)
+- Canvas 2D API for advanced 2D rendering with batch optimization
+- Web Audio API for spatial audio and sound effects
+- LocalStorage with enhanced save/load system for comprehensive state preservation
+- Touch, pointer, and gesture events for mobile interaction
+- Device orientation and motion APIs for immersive controls
+- Accessibility APIs (ARIA, screen readers) for inclusive design
 
 ### Documentation Strategy
-The project heavily emphasizes documentation:
-- Each system has dedicated documentation
-- Integration examples show system combinations
-- Architecture guides explain design decisions
-- Code examples demonstrate proper usage patterns
+The project combines comprehensive source code implementation with extensive documentation:
+- Each system has both implemented source code and dedicated documentation
+- Integration examples demonstrate real system combinations with working code
+- Architecture guides explain design decisions backed by implemented patterns
+- Advanced features like performance monitoring, accessibility, and mobile optimizations are fully documented
+- Code examples in both documentation and working engine source demonstrate proper usage
 
 This codebase serves as both a working game engine and an educational resource for understanding game architecture patterns.

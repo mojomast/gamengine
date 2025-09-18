@@ -1,0 +1,77 @@
+{
+  "id": "cosmic-defenders-2025",
+  "name": "Cosmic Crystal Defenders",
+  "description": "An epic tower defense game with advanced SVG graphics, multi-layer rendering, particle effects, and comprehensive game systems. Features dynamic enemy waves, upgradeable towers, special abilities, and stunning visual effects.",
+  "template": "game-engine-advanced",
+  "version": "1.0.0",
+  "createdAt": "2025-09-18T00:00:00.000Z",
+  "author": "AI Game Engine",
+  "tags": ["tower-defense", "svg", "particles", "strategy", "cosmic", "action"],
+  "features": {
+    "graphics": {
+      "svgRendering": true,
+      "multiLayerCanvas": true,
+      "particleSystem": true,
+      "dynamicAnimations": true,
+      "visualEffects": ["explosions", "lightning", "trails", "glows", "nebulas"]
+    },
+    "gameplay": {
+      "towerTypes": 4,
+      "enemyTypes": 5,
+      "abilities": 3,
+      "waveSystem": true,
+      "upgradeSystem": true,
+      "resourceManagement": true,
+      "scoreMultipliers": true
+    },
+    "ui": {
+      "hudSystem": "advanced",
+      "menuSystem": true,
+      "tutorialOverlay": true,
+      "performanceMonitor": true,
+      "responsiveDesign": true
+    },
+    "audio": {
+      "soundEffects": true,
+      "backgroundMusic": true,
+      "spatialAudio": false
+    },
+    "engine": {
+      "objectPooling": true,
+      "stateManagement": true,
+      "inputHandling": ["keyboard", "mouse", "touch"],
+      "saveSystem": false,
+      "deltaTime": true,
+      "fpsCap": 60
+    }
+  },
+  "controls": {
+    "mouse": {
+      "leftClick": "Place tower / Select",
+      "rightClick": "Cancel / Deselect",
+      "hover": "Show tower range"
+    },
+    "keyboard": {
+      "1-4": "Select tower type",
+      "Q": "Freeze ability",
+      "W": "Bomb ability",
+      "E": "Boost ability",
+      "Space": "Pause game",
+      "Shift": "Fast forward"
+    }
+  },
+  "performance": {
+    "targetFPS": 60,
+    "maxEntities": 500,
+    "maxParticles": 1000,
+    "canvasWidth": 1280,
+    "canvasHeight": 720
+  },
+  "dependencies": {
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900",
+      "https://fonts.googleapis.com/css2?family=Audiowide"
+    ],
+    "external": []
+  }
+}
