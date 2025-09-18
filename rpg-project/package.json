@@ -1,0 +1,112 @@
+{
+  "name": "final-fantasy-3-style-rpg",
+  "version": "1.0.0",
+  "description": "A comprehensive Final Fantasy 3 style RPG game built with HTML5/JavaScript",
+  "main": "src/core/RPGEngine.js",
+  "type": "module",
+  "scripts": {
+    "install": "npm install",
+    "dev": "vite --host",
+    "dev:simple": "node server.js",
+    "build:dev": "vite build --mode development",
+    "build:prod": "vite build --mode production",
+    "preview": "vite preview",
+    "deploy:web": "npm run build:prod && gh-pages -d dist",
+    "deploy:cdn": "npm run build:prod && aws s3 sync dist/ s3://your-cdn-bucket --delete",
+    "build:electron": "npm run build:prod && electron-builder",
+    "package:electron": "npm run build:electron -- --publish never",
+    "build:pwa": "npm run build:prod && workbox generateSW workbox-config.js",
+    "build:app-manifests": "node scripts/generate-manifests.js",
+    "test": "node src/core/TestingFramework.js",
+    "test:watch": "npm test -- --watch",
+    "lint": "eslint src/ --ext .js",
+    "clean": "rm -rf dist/ build/",
+    "serve": "http-server dist/ -p 3000"
+  },
+  "keywords": [
+    "rpg",
+    "game",
+    "final-fantasy",
+    "html5",
+    "javascript",
+    "web-game",
+    "turn-based"
+  ],
+  "author": "RPG Development Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/ff3-rpg-engine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/ff3-rpg-engine/issues"
+  },
+  "homepage": "https://yourusername.github.io/ff3-rpg-engine",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
+  },
+  "dependencies": {
+    "three": "^0.158.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0",
+    "workbox-cli": "^7.0.0",
+    "gh-pages": "^6.0.0",
+    "aws-cli": "^1.32.0",
+    "http-server": "^14.1.1",
+    "eslint": "^8.50.0",
+    "@eslint/js": "^8.50.0",
+    "jest": "^29.7.0",
+    "puppeteer": "^21.0.0"
+  },
+  "build": {
+    "appId": "com.yourcompany.ff3rpg",
+    "productName": "FF3 Style RPG",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.games"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "es2021": true,
+      "node": true
+    },
+    "extends": [
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    }
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": ["<rootDir>/src/core/TestingFramework.js"],
+    "testMatch": [
+      "**/__tests__/**/*.js",
+      "**/?(*.)+(spec|test).js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/**/TestingFramework.js"
+    ]
+  }
+}
