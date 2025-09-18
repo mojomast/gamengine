@@ -1,0 +1,2274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUMFIGHTS - Created by Aisatoshi</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: linear-gradient(45deg, #1a0033, #330019);
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            color: white;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        #gameCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle, #2a1810, #1a0f08);
+        }
+        
+        .animated-title {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            z-index: 1000;
+            animation: titlePulse 2s infinite, titleRainbow 3s infinite linear;
+            text-shadow: 0 0 20px currentColor;
+        }
+        
+        @keyframes titlePulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1); }
+        }
+        
+        @keyframes titleRainbow {
+            0% { color: #ff0000; }
+            16% { color: #ff8000; }
+            33% { color: #ffff00; }
+            50% { color: #00ff00; }
+            66% { color: #0080ff; }
+            83% { color: #8000ff; }
+            100% { color: #ff0000; }
+        }
+        
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        .stats-panel {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            background: rgba(0,0,0,0.9);
+            padding: 20px;
+            border-radius: 15px;
+            border: 3px solid #ff1493;
+            font-size: 18px;
+            min-width: 280px;
+            box-shadow: 0 0 20px rgba(255, 20, 147, 0.5);
+        }
+        
+        .weapons-panel {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            background: rgba(0,0,0,0.9);
+            padding: 20px;
+            border-radius: 15px;
+            border: 3px solid #00ff00;
+            font-size: 18px;
+            min-width: 250px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+        
+        .event-log {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: 2px solid #ffff00;
+            font-size: 16px;
+            min-width: 600px;
+            max-height: 100px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(255, 255, 0, 0.3);
+        }
+        
+        .scrolling-text {
+            animation: scrollText 3s ease-out forwards;
+            color: #ffff00;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        @keyframes scrollText {
+            0% {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+        }
+        
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #ddd;
+            background: rgba(0,0,0,0.8);
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .combo-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: #ff6600;
+            text-shadow: 0 0 20px #ff6600;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .combo-display.show {
+            opacity: 1;
+            font-size: 64px;
+        }
+        
+        .intro-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="star" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="%23ffffff" stop-opacity="1"/><stop offset="100%" stop-color="%23ffffff" stop-opacity="0"/></radialGradient></defs><circle cx="100" cy="100" r="1" fill="url(%23star)"/><circle cx="200" cy="150" r="0.5" fill="url(%23star)"/><circle cx="300" cy="80" r="1.5" fill="url(%23star)"/><circle cx="400" cy="200" r="0.8" fill="url(%23star)"/><circle cx="500" cy="50" r="1.2" fill="url(%23star)"/><circle cx="600" cy="180" r="0.6" fill="url(%23star)"/><circle cx="700" cy="120" r="1" fill="url(%23star)"/><circle cx="800" cy="160" r="0.7" fill="url(%23star)"/><circle cx="900" cy="90" r="1.3" fill="url(%23star)"/><circle cx="150" cy="300" r="0.9" fill="url(%23star)"/><circle cx="250" cy="350" r="0.4" fill="url(%23star)"/><circle cx="350" cy="280" r="1.1" fill="url(%23star)"/><circle cx="450" cy="400" r="0.8" fill="url(%23star)"/><circle cx="550" cy="250" r="1.4" fill="url(%23star)"/><circle cx="650" cy="380" r="0.5" fill="url(%23star)"/><circle cx="750" cy="320" r="1" fill="url(%23star)"/><circle cx="850" cy="360" r="0.6" fill="url(%23star)"/><circle cx="950" cy="290" r="1.2" fill="url(%23star)"/><circle cx="50" cy="500" r="0.7" fill="url(%23star)"/><circle cx="180" cy="550" r="1" fill="url(%23star)"/><circle cx="280" cy="480" r="0.8" fill="url(%23star)"/><circle cx="380" cy="600" r="1.5" fill="url(%23star)"/><circle cx="480" cy="450" r="0.9" fill="url(%23star)"/><circle cx="580" cy="580" r="0.4" fill="url(%23star)"/><circle cx="680" cy="520" r="1.1" fill="url(%23star)"/><circle cx="780" cy="560" r="0.7" fill="url(%23star)"/><circle cx="880" cy="490" r="1.3" fill="url(%23star)"/><circle cx="120" cy="700" r="0.6" fill="url(%23star)"/><circle cx="220" cy="750" r="1" fill="url(%23star)"/><circle cx="320" cy="680" r="0.8" fill="url(%23star)"/><circle cx="420" cy="800" r="1.2" fill="url(%23star)"/><circle cx="520" cy="650" r="0.5" fill="url(%23star)"/><circle cx="620" cy="780" r="1.4" fill="url(%23star)"/><circle cx="720" cy="720" r="0.9" fill="url(%23star)"/><circle cx="820" cy="760" r="0.7" fill="url(%23star)"/><circle cx="920" cy="690" r="1.1" fill="url(%23star)"/><circle cx="80" cy="900" r="0.8" fill="url(%23star)"/><circle cx="190" cy="950" r="1" fill="url(%23star)"/><circle cx="290" cy="880" r="0.6" fill="url(%23star)"/><circle cx="390" cy="1000" r="1.3" fill="url(%23star)"/><circle cx="490" cy="850" r="0.9" fill="url(%23star)"/><circle cx="590" cy="980" r="0.4" fill="url(%23star)"/><circle cx="690" cy="920" r="1.2" fill="url(%23star)"/><circle cx="790" cy="960" r="0.7" fill="url(%23star)"/><circle cx="890" cy="890" r="1" fill="url(%23star)"/></svg>') repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: #ffff00;
+            text-align: center;
+            padding: 40px;
+            overflow: hidden;
+            perspective: 400px;
+        }
+        
+        .intro-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(to bottom, rgba(0, 4, 40, 1) 0%, rgba(0, 4, 40, 0) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .intro-title {
+            font-size: 100px;
+            color: #ffff00;
+            text-shadow: 0 0 30px #ffff00, 0 0 60px #ffff00, 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 20px;
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%) perspective(300px) rotateX(15deg);
+            z-index: 10;
+            text-transform: uppercase;
+        }
+        
+        .intro-story {
+            font-size: 140px;
+            line-height: 1.4;
+            max-width: 100vw;
+            width: 100vw;
+            color: #ffff00;
+            transform: perspective(400px) rotateX(8deg) translateY(500vh);
+            animation: starWarsScroll 50s linear forwards;
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform-origin: center bottom;
+            margin-left: -50vw;
+            text-align: center;
+            z-index: 5;
+            text-shadow: 6px 6px 12px rgba(0,0,0,0.9);
+            font-weight: bold;
+        }
+        
+        .intro-story.start-scroll {
+            animation: starWarsScroll 40s linear forwards;
+        }
+        
+        @keyframes starWarsScroll {
+            0% {
+                transform: perspective(400px) rotateX(8deg) translateY(500vh);
+                opacity: 0;
+            }
+            3% {
+                opacity: 1;
+            }
+            85% {
+                opacity: 1;
+            }
+            100% {
+                transform: perspective(400px) rotateX(8deg) translateY(-250vh);
+                opacity: 0;
+            }
+        }
+        
+        .skill-tree {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            border: 3px solid #00ff00;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 800px;
+            max-height: 600px;
+            overflow-y: auto;
+            z-index: 5000;
+            display: none;
+        }
+        
+        .skill-node {
+            background: rgba(0,100,0,0.3);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            width: 200px;
+            text-align: center;
+        }
+        
+        .skill-node:hover {
+            background: rgba(0,150,0,0.5);
+            transform: scale(1.05);
+        }
+        
+        .skill-node.purchased {
+            background: rgba(0,200,0,0.8);
+            border-color: #ffff00;
+        }
+        
+        .damage-indicator {
+            position: absolute;
+            color: #ff0000;
+            font-weight: bold;
+            font-size: 18px;
+            text-shadow: 0 0 5px #000;
+            pointer-events: none;
+            z-index: 1000;
+            animation: damageFloat 1.5s ease-out forwards;
+        }
+        
+        .damage-indicator.critical {
+            color: #ffff00;
+            font-size: 24px;
+            text-shadow: 0 0 10px #ff0000;
+        }
+        
+        @keyframes damageFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+        }
+        
+        .intro-continue {
+            font-size: 20px;
+            color: #ffff00;
+            animation: blink 1.5s infinite;
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+            text-shadow: 0 0 10px #ffff00;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Star Wars intro music -->
+    <audio id="introMusic" autoplay loop>
+        <source src="starwars.mp3" type="audio/mpeg">
+        <source src="starwars.wav" type="audio/wav">
+        <!-- Note: Convert your starwars.mid to MP3 or WAV format -->
+        Your browser does not support the audio element.
+    </audio>
+    
+    <!-- Limp Bizkit gameplay music -->
+    <audio id="gameMusic" loop>
+        <source src="limpbizkit.mp3" type="audio/mpeg">
+        <source src="limpbizkit.wav" type="audio/wav">
+        <!-- Note: Convert your limpbizkit.mid to MP3 or WAV format -->
+        Your browser does not support the audio element.
+    </audio>
+    
+    <script>
+        // Handle automatic audio initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            const introMusic = document.getElementById('introMusic');
+            const gameMusic = document.getElementById('gameMusic');
+            
+            console.log('🎵 Initializing MP3 audio system...');
+            
+            // Set volume levels first
+            introMusic.volume = 0.7;
+            gameMusic.volume = 0.8;
+            
+            // Try to start intro music immediately
+            setTimeout(() => {
+                introMusic.play().then(() => {
+                    console.log('🎵 Star Wars MP3 started successfully!');
+                }).catch(e => {
+                    console.log('Star Wars intro music autoplay blocked by browser:', e);
+                    // Add interaction handler to start music
+                    const startAudio = function() {
+                        introMusic.play();
+                        console.log('🎵 Star Wars MP3 started on user interaction!');
+                        document.removeEventListener('click', startAudio);
+                        document.removeEventListener('keydown', startAudio);
+                    };
+                    document.addEventListener('click', startAudio, { once: true });
+                    document.addEventListener('keydown', startAudio, { once: true });
+                });
+            }, 100);
+        });
+    </script>
+    
+    <div id="introScreen" class="intro-screen">
+        <div class="intro-title">BUMFIGHTS</div>
+        <div class="intro-story" id="introStory">
+            <p style="font-size: 120px; margin-bottom: 50px; color: #00ff00;"><strong>Episode I: THE TOKEN AWAKENS</strong></p>
+            <p>It is the year 2025. The galaxy of coding has fallen into darkness...</p>
+            <p>AISATOSHI, a bad vibe coder with nothing better to do, finds himself broke and desperate for tokens in a world gone mad.</p>
+            <p>The streets are filled with hostile bums, roaming in packs, terrorizing innocent coders who just want to afford their next energy drink.</p>
+            <p>Armed only with his fists, an insatiable love for butts, and the desperate need to survive, our hero must fight his way through endless waves of enemies.</p>
+            <p>Every bum defeated drops precious tokens - the only currency that matters in this dystopian coding wasteland. With each battle, Aisatoshi grows stronger.</p>
+            <p>With each victory, he levels up his butt-kicking abilities. But can our hero survive the chaos long enough to earn the tokens needed to escape this mad world?</p>
+            <p style="font-size: 160px; color: #ff1493; margin-top: 40px;"><strong>The battle for tokens begins NOW...</strong></p>
+        </div>
+        <div class="intro-continue">Press SPACE to begin your epic journey...</div>
+    </div>
+    
+    <canvas id="gameCanvas"></canvas>
+    
+    <div class="animated-title">BUMFIGHTS - CREATED BY AISATOSHI</div>
+    
+    <div class="ui-overlay">
+        <div class="stats-panel" id="statsPanel">
+            <div style="color: #ff1493; font-weight: bold; margin-bottom: 10px;">📊 STATS</div>
+            <div id="gameStats">Loading...</div>
+        </div>
+        
+        <div class="weapons-panel" id="weaponsPanel">
+            <div style="color: #00ff00; font-weight: bold; margin-bottom: 15px;">🔫 WEAPONS & LEVEL</div>
+            <div id="weaponStats">No weapons</div>
+        </div>
+    </div>
+    
+    <div class="event-log" id="eventLog">
+        <div class="scrolling-text" id="eventText">Welcome to BUMFIGHTS!</div>
+    </div>
+    
+    <div class="skill-tree" id="skillTree">
+        <h2 style="color: #00ff00; text-align: center; margin-bottom: 20px;">⭐ AISATOSHI'S SKILL TREE ⭐</h2>
+        <div style="color: #ffff00; text-align: center; margin-bottom: 20px;" id="skillPoints">Skill Points: 0</div>
+        <div id="skillNodes"></div>
+        <button onclick="closeSkillTree()" style="margin-top: 20px; padding: 10px 20px; background: #ff0000; color: white; border: none; border-radius: 5px; cursor: pointer;">Close (ESC)</button>
+    </div>
+    
+    <div class="controls">
+        <strong>Controls:</strong>
+        WASD - Move • SPACE - Punch (mash for combos!) • F - Special Butt Attack • T - Skill Tree • ESC - Pause
+    </div>
+    
+    <div id="comboDisplay" class="combo-display"></div>
+
+    <script type="module">
+        // Import the game engine
+        import { GameEngine } from '../game-engine/src/core/GameEngine.js';
+        import { Scene } from '../game-engine/src/core/Scene.js';
+        import { GameObject } from '../game-engine/src/core/GameObject.js';
+        
+        // Persistent blood stain class (stays on floor)
+        class BloodStain {
+            constructor(x, y, size = 1) {
+                this.x = x;
+                this.y = y;
+                this.size = 3 + Math.random() * size * 3;
+                this.life = 999999; // Permanent stains
+                this.alpha = 0.8;
+                this.color = `rgb(${80 + Math.random() * 40}, ${Math.random() * 10}, ${Math.random() * 10})`;
+                this.permanent = true;
+            }
+            
+            update(dt) {
+                // Stains are permanent, no decay
+            }
+            
+            render(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Add smaller spots around main stain
+                for (let i = 0; i < 3; i++) {
+                    const offsetX = (Math.random() - 0.5) * this.size * 2;
+                    const offsetY = (Math.random() - 0.5) * this.size * 2;
+                    ctx.beginPath();
+                    ctx.arc(this.x + offsetX, this.y + offsetY, this.size * 0.3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+            }
+        }
+        
+        // Enhanced blood splatter class (flying particles)
+        class BloodSplatter {
+            constructor(x, y, size = 1) {
+                this.x = x;
+                this.y = y;
+                this.size = 3 + Math.random() * size * 3;
+                this.life = 5.0; // Temporary flying blood
+                this.alpha = 1;
+                this.color = `rgb(${120 + Math.random() * 80}, ${Math.random() * 20}, ${Math.random() * 20})`;
+                this.sticky = false;
+            }
+            
+            update(dt) {
+                this.life -= dt;
+                this.alpha = Math.max(0, this.life / 5.0);
+            }
+            
+            render(ctx) {
+                if (this.life <= 0) return;
+                
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Add smaller spots around main splatter
+                for (let i = 0; i < 3; i++) {
+                    const offsetX = (Math.random() - 0.5) * this.size * 2;
+                    const offsetY = (Math.random() - 0.5) * this.size * 2;
+                    ctx.beginPath();
+                    ctx.arc(this.x + offsetX, this.y + offsetY, this.size * 0.3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+            }
+        }
+        
+        // Body part class for extreme gore
+        class BodyPart {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type; // 'arm', 'leg', 'head', 'torso'
+                this.vx = (Math.random() - 0.5) * 300;
+                this.vy = -100 - Math.random() * 200;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 10;
+                this.life = 999; // Permanent
+                this.bounces = 0;
+                this.maxBounces = 2 + Math.floor(Math.random() * 3);
+                this.size = this.getSize();
+                this.color = this.getColor();
+                this.settled = false;
+            }
+            
+            getSize() {
+                const sizes = {
+                    'head': { w: 12, h: 12 },
+                    'arm': { w: 18, h: 6 },
+                    'leg': { w: 20, h: 8 },
+                    'torso': { w: 16, h: 20 }
+                };
+                return sizes[this.type] || { w: 10, h: 10 };
+            }
+            
+            getColor() {
+                return `rgb(${120 + Math.random() * 80}, ${Math.random() * 20}, ${Math.random() * 20})`;
+            }
+            
+            update(dt) {
+                if (this.settled) return;
+                
+                this.x += this.vx * dt;
+                this.y += this.vy * dt;
+                this.vy += 300 * dt; // Gravity
+                this.rotation += this.rotationSpeed * dt;
+                
+                // Bounce off ground
+                if (this.y > window.innerHeight - 50) {
+                    if (this.bounces < this.maxBounces) {
+                        this.y = window.innerHeight - 50;
+                        this.vy *= -0.6; // Bounce
+                        this.vx *= 0.8; // Friction
+                        this.rotationSpeed *= 0.7;
+                        this.bounces++;
+                    } else {
+                        this.settled = true;
+                        this.y = window.innerHeight - 50;
+                        this.vx = 0;
+                        this.vy = 0;
+                        this.rotationSpeed = 0;
+                    }
+                }
+                
+                // Bounds
+                if (this.x < 0 || this.x > window.innerWidth) {
+                    this.vx *= -0.7;
+                    this.x = Math.max(0, Math.min(window.innerWidth, this.x));
+                }
+            }
+            
+            render(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                
+                ctx.fillStyle = this.color;
+                
+                // Draw different body parts
+                switch(this.type) {
+                    case 'head':
+                        // Head with face
+                        ctx.fillRect(-this.size.w/2, -this.size.h/2, this.size.w, this.size.h);
+                        ctx.fillStyle = '#000';
+                        ctx.fillRect(-3, -3, 2, 2); // Eye
+                        ctx.fillRect(1, -3, 2, 2);  // Eye
+                        ctx.fillRect(-2, 1, 4, 1);  // Mouth
+                        break;
+                    case 'arm':
+                        // Arm with hand
+                        ctx.fillRect(-this.size.w/2, -this.size.h/2, this.size.w, this.size.h);
+                        ctx.fillRect(this.size.w/2-3, -this.size.h/2, 5, this.size.h); // Hand
+                        break;
+                    case 'leg':
+                        // Leg with foot
+                        ctx.fillRect(-this.size.w/2, -this.size.h/2, this.size.w, this.size.h);
+                        ctx.fillRect(-this.size.w/2, this.size.h/2-2, this.size.w+4, 4); // Foot
+                        break;
+                    case 'torso':
+                        // Torso
+                        ctx.fillRect(-this.size.w/2, -this.size.h/2, this.size.w, this.size.h);
+                        break;
+                }
+                
+                ctx.restore();
+            }
+        }
+        
+        // Damage indicator class
+        class DamageIndicator {
+            constructor(x, y, damage, isCritical = false) {
+                this.x = x;
+                this.y = y;
+                this.damage = damage;
+                this.isCritical = isCritical;
+                this.life = 1.5;
+                this.alpha = 1;
+                this.vy = -80; // Float upward
+                this.vx = (Math.random() - 0.5) * 30;
+            }
+            
+            update(dt) {
+                this.x += this.vx * dt;
+                this.y += this.vy * dt;
+                this.life -= dt;
+                this.alpha = Math.max(0, this.life / 1.5);
+            }
+            
+            render(ctx) {
+                if (this.life <= 0) return;
+                
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.isCritical ? '#ffff00' : '#ff0000';
+                ctx.font = this.isCritical ? 'bold 24px Courier New' : 'bold 18px Courier New';
+                ctx.textAlign = 'center';
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2;
+                
+                const text = this.isCritical ? `CRIT! ${this.damage}` : `${this.damage}`;
+                ctx.strokeText(text, this.x, this.y);
+                ctx.fillText(text, this.x, this.y);
+                
+                ctx.restore();
+            }
+        }
+        
+        // Token pickup class (improved to hover and not fall)
+        class Token {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.startY = y;
+                this.vx = (Math.random() - 0.5) * 50;
+                this.vy = -30 - Math.random() * 30;
+                this.life = 8.0; // 8 seconds to pick up
+                this.size = 15;
+                this.collected = false;
+                this.animTime = 0;
+                this.hoverHeight = 10 + Math.random() * 10;
+                this.settled = false;
+            }
+            
+            update(dt) {
+                this.animTime += dt;
+                
+                if (!this.settled) {
+                    this.x += this.vx * dt;
+                    this.y += this.vy * dt;
+                    this.vy += 150 * dt; // Lighter gravity
+                    
+                    // Settle at a hovering position
+                    if (this.vy > 0 && this.y > this.startY) {
+                        this.settled = true;
+                        this.y = this.startY;
+                        this.vx = 0;
+                        this.vy = 0;
+                    }
+                } else {
+                    // Hover animation
+                    this.y = this.startY + Math.sin(this.animTime * 3) * this.hoverHeight;
+                }
+                
+                this.life -= dt;
+            }
+            
+            render(ctx) {
+                if (this.life <= 0 || this.collected) return;
+                
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                
+                // Rotating golden token
+                ctx.rotate(this.animTime * 3);
+                
+                // Glow effect
+                ctx.shadowColor = '#ffd700';
+                ctx.shadowBlur = 20;
+                
+                // Token shape
+                ctx.fillStyle = '#ffd700';
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Inner detail
+                ctx.fillStyle = '#ffaa00';
+                ctx.fillRect(-4, -4, 8, 8);
+                
+                ctx.restore();
+            }
+        }
+        
+        // Weapon pickup class
+        class Weapon {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type; // 'bat', 'knife', 'pipe'
+                this.damage = this.getWeaponDamage(type);
+                this.name = this.getWeaponName(type);
+                this.life = 10.0;
+                this.collected = false;
+                this.animTime = 0;
+            }
+            
+            getWeaponDamage(type) {
+                const damages = { 'bat': 40, 'knife': 60, 'pipe': 50 };
+                return damages[type] || 30;
+            }
+            
+            getWeaponName(type) {
+                const names = { 'bat': 'Baseball Bat', 'knife': 'Rusty Knife', 'pipe': 'Metal Pipe' };
+                return names[type] || 'Unknown';
+            }
+            
+            update(dt) {
+                this.animTime += dt;
+                this.life -= dt;
+            }
+            
+            render(ctx) {
+                if (this.life <= 0 || this.collected) return;
+                
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                
+                // Floating animation
+                ctx.translate(0, Math.sin(this.animTime * 2) * 5);
+                
+                // Weapon glow
+                ctx.shadowColor = '#00ff00';
+                ctx.shadowBlur = 15;
+                
+                // Draw weapon based on type
+                if (this.type === 'bat') {
+                    ctx.fillStyle = '#8B4513';
+                    ctx.fillRect(-3, -15, 6, 30);
+                    ctx.fillRect(-8, -18, 16, 6);
+                } else if (this.type === 'knife') {
+                    ctx.fillStyle = '#C0C0C0';
+                    ctx.fillRect(-2, -15, 4, 25);
+                    ctx.fillStyle = '#8B4513';
+                    ctx.fillRect(-3, 5, 6, 10);
+                } else if (this.type === 'pipe') {
+                    ctx.fillStyle = '#696969';
+                    ctx.fillRect(-4, -15, 8, 30);
+                }
+                
+                ctx.restore();
+            }
+        }
+        
+        // Blood particle class for violence effects
+        class BloodParticle {
+            constructor(x, y, vx, vy) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.size = Math.random() * 4 + 2;
+                this.life = 1.0;
+                this.gravity = 200;
+                this.color = `rgb(${150 + Math.random() * 105}, ${Math.random() * 50}, ${Math.random() * 30})`;
+            }
+            
+            update(dt) {
+                this.x += this.vx * dt;
+                this.y += this.vy * dt;
+                this.vy += this.gravity * dt;
+                this.life -= dt * 2;
+                this.vx *= 0.98;
+            }
+            
+            render(ctx) {
+                if (this.life <= 0) return;
+                
+                ctx.save();
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Add splatter effect
+                if (this.life > 0.5) {
+                    ctx.fillStyle = `rgba(139, 0, 0, ${this.life * 0.5})`;
+                    ctx.fillRect(this.x - 1, this.y - 1, 2, 2);
+                }
+                ctx.restore();
+            }
+        }
+        
+        // Aisatoshi - The butt-loving hero!
+        class Aisatoshi extends GameObject {
+            constructor(x, y) {
+                super(x, y);
+                this.size = { width: 32, height: 48 };
+                this.health = 100;
+                this.maxHealth = 100;
+                this.speed = 300;
+                this.facing = 1; // 1 = right, -1 = left
+                this.punching = false;
+                this.punchTimer = 0;
+                this.combo = 0;
+                this.comboTimer = 0;
+                this.invulnerable = 0;
+                this.animTime = 0;
+                this.buttAttackReady = true;
+                this.buttAttackCooldown = 0;
+                
+                // Combat stats
+                this.damage = 20;
+                this.comboMultiplier = 1;
+                
+                // Weapon system
+                this.weapon = null;
+                this.tokens = 0;
+                
+                // Leveling system
+                this.level = 1;
+                this.experience = 0;
+                this.experienceToNext = 100;
+                this.skillPoints = 0;
+                
+                // Attack animation
+                this.attackAnimation = 0;
+                this.attackRange = { width: 60, height: 40 };
+                this.showAttackRange = 0;
+                
+                // Skill system
+                this.skills = {
+                    damage: 0,       // +10 damage per level
+                    health: 0,       // +50 max health per level
+                    speed: 0,        // +50 speed per level
+                    critChance: 0,   // +5% crit chance per level
+                    comboMaster: 0,  // +0.1 combo multiplier per level
+                    bloodlust: 0     // Heal on kill, +5 HP per level
+                };
+                
+                // Death animation
+                this.isDying = false;
+                this.deathAnimation = 0;
+            }
+            
+            update(deltaTime) {
+                super.update(deltaTime);
+                this.animTime += deltaTime;
+                
+                // Update timers
+                if (this.punchTimer > 0) {
+                    this.punchTimer -= deltaTime;
+                    if (this.punchTimer <= 0) {
+                        this.punching = false;
+                    }
+                }
+                
+                if (this.comboTimer > 0) {
+                    this.comboTimer -= deltaTime;
+                    if (this.comboTimer <= 0) {
+                        this.combo = 0;
+                        this.comboMultiplier = 1;
+                    }
+                }
+                
+                if (this.invulnerable > 0) {
+                    this.invulnerable -= deltaTime;
+                }
+                
+                if (this.buttAttackCooldown > 0) {
+                    this.buttAttackCooldown -= deltaTime;
+                    if (this.buttAttackCooldown <= 0) {
+                        this.buttAttackReady = true;
+                    }
+                }
+                
+                if (this.attackAnimation > 0) {
+                    this.attackAnimation -= deltaTime * 3;
+                }
+                
+                if (this.showAttackRange > 0) {
+                    this.showAttackRange -= deltaTime * 4;
+                }
+            }
+            
+            punch() {
+                if (this.punchTimer > 0) return false;
+                
+                this.punching = true;
+                this.punchTimer = 0.3;
+                this.combo++;
+                this.comboTimer = 1.0; // Reset combo timer
+                this.attackAnimation = 1.0; // Start attack animation
+                this.showAttackRange = 1.0; // Show attack range
+                
+                // Increase damage multiplier with combo
+                this.comboMultiplier = 1 + (this.combo * 0.2);
+                
+                // Calculate damage (weapon + skills add damage)
+                let baseDamage = this.damage + (this.level - 1) * 5 + (this.skills.damage * 10);
+                if (this.weapon) {
+                    baseDamage += this.weapon.damage;
+                }
+                
+                // Apply skill bonuses
+                const skillComboBonus = 1 + (this.skills.comboMaster * 0.1);
+                const finalMultiplier = this.comboMultiplier * skillComboBonus;
+                let totalDamage = Math.floor(baseDamage * finalMultiplier);
+                
+                // Show combo display
+                this.showCombo();
+                
+                // Enhanced attack range based on weapon (weapons have better range)
+                let range = this.attackRange;
+                let attackDistance = 40;
+                if (this.weapon) {
+                    if (this.weapon.type === 'bat') {
+                        range = { width: 100, height: 60 };
+                        attackDistance = 60;
+                    } else if (this.weapon.type === 'pipe') {
+                        range = { width: 95, height: 55 };
+                        attackDistance = 55;
+                    } else if (this.weapon.type === 'knife') {
+                        range = { width: 70, height: 45 };
+                        attackDistance = 45;
+                    }
+                }
+                
+                // Critical chance with skill bonuses
+                const baseCritChance = 0.15 + (this.skills.critChance * 0.05);
+                const isCritical = Math.random() < baseCritChance;
+                
+                return {
+                    x: this.position.x + (this.facing * attackDistance),
+                    y: this.position.y,
+                    damage: totalDamage,
+                    width: range.width,
+                    height: range.height,
+                    isCritical: isCritical
+                };
+            }
+            
+            buttAttack() {
+                if (!this.buttAttackReady) return false;
+                
+                this.buttAttackReady = false;
+                this.buttAttackCooldown = 3.0;
+                
+                let damage = this.damage * 3;
+                if (this.weapon) {
+                    damage += this.weapon.damage;
+                }
+                
+                return {
+                    x: this.position.x,
+                    y: this.position.y,
+                    damage: damage,
+                    width: 120,
+                    height: 120,
+                    special: true
+                };
+            }
+            
+            pickupWeapon(weapon) {
+                this.weapon = weapon;
+                weapon.collected = true;
+            }
+            
+            addTokens(amount) {
+                this.tokens += amount;
+            }
+            
+            gainExperience(amount) {
+                this.experience += amount;
+                if (this.experience >= this.experienceToNext) {
+                    this.levelUp();
+                }
+            }
+            
+            levelUp() {
+                this.level++;
+                this.skillPoints += 2;
+                this.experience -= this.experienceToNext;
+                this.experienceToNext = Math.floor(this.experienceToNext * 1.5);
+                
+                // Level up bonuses (including skill bonuses)
+                const healthBonus = 20 + (this.skills.health * 50);
+                this.maxHealth += healthBonus;
+                this.health = this.maxHealth; // Full heal on level up
+                this.damage += 5;
+                
+                return true; // Signal level up occurred
+            }
+            
+            purchaseSkill(skillName) {
+                if (this.skillPoints > 0 && this.skills.hasOwnProperty(skillName)) {
+                    this.skills[skillName]++;
+                    this.skillPoints--;
+                    
+                    // Apply immediate bonuses
+                    if (skillName === 'health') {
+                        this.maxHealth += 50;
+                        this.health += 50; // Also increase current health
+                    } else if (skillName === 'speed') {
+                        this.speed += 50;
+                    }
+                    
+                    return true;
+                }
+                return false;
+            }
+            
+            startDeathAnimation() {
+                this.isDying = true;
+                this.deathAnimation = 1.0;
+            }
+            
+            showCombo() {
+                const comboDisplay = document.getElementById('comboDisplay');
+                if (this.combo > 1) {
+                    comboDisplay.textContent = `${this.combo}x COMBO!`;
+                    if (this.combo > 5) {
+                        comboDisplay.textContent = `${this.combo}x BUTT DESTROYER!`;
+                    }
+                    comboDisplay.classList.add('show');
+                    setTimeout(() => {
+                        comboDisplay.classList.remove('show');
+                    }, 800);
+                }
+            }
+            
+            takeDamage(damage) {
+                if (this.invulnerable > 0) return false;
+                
+                this.health -= damage;
+                this.invulnerable = 0.5;
+                
+                if (this.health <= 0) {
+                    this.health = 0;
+                    return true; // Dead
+                }
+                return false;
+            }
+            
+            draw(ctx) {
+                // Flash red when invulnerable
+                const flash = this.invulnerable > 0 && Math.sin(this.animTime * 30) > 0;
+                const attackOffset = this.attackAnimation > 0 ? Math.sin(this.attackAnimation * 10) * 3 : 0;
+                
+                ctx.save();
+                if (flash) {
+                    ctx.globalAlpha = 0.5;
+                    ctx.fillStyle = '#ff0000';
+                }
+                
+                // Body (purple shirt like in screenshot)
+                ctx.fillStyle = flash ? '#ff9999' : '#6666ff';
+                ctx.fillRect(6, 16, 20, 24);
+                
+                // Head
+                ctx.fillStyle = flash ? '#ff9999' : '#ffdbac';
+                ctx.fillRect(8, 4, 16, 16);
+                
+                // Eyes (bigger, more expressive)
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(11, 8, 3, 3);
+                ctx.fillRect(17, 8, 3, 3);
+                
+                // Mouth (cheeky grin)
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(12, 13, 8, 2);
+                
+                // Arms with attack animation
+                ctx.fillStyle = flash ? '#ff9999' : '#ffdbac';
+                if (this.punching || this.attackAnimation > 0) {
+                    // Punching pose with animation
+                    ctx.fillRect(26 + attackOffset, 18, 8, 4); // Extended arm
+                    ctx.fillRect(-2, 20, 8, 4);  // Other arm back
+                } else {
+                    ctx.fillRect(2, 18, 6, 4);
+                    ctx.fillRect(24, 18, 6, 4);
+                }
+                
+                // Legs (dark pants)
+                ctx.fillStyle = flash ? '#ff4444' : '#333333';
+                ctx.fillRect(10, 40, 5, 8);
+                ctx.fillRect(17, 40, 5, 8);
+                
+                // Draw weapon if equipped
+                if (this.weapon) {
+                    this.drawWeapon(ctx);
+                }
+                
+                // Show attack range when attacking
+                if (this.showAttackRange > 0) {
+                    ctx.save();
+                    ctx.globalAlpha = this.showAttackRange * 0.5;
+                    ctx.strokeStyle = this.weapon ? '#ff6600' : '#ff0000';
+                    ctx.lineWidth = 3;
+                    
+                    const range = this.weapon ? { width: 80, height: 50 } : this.attackRange;
+                    const rangeX = this.facing > 0 ? 25 : -range.width - 25;
+                    ctx.strokeRect(rangeX, -range.height/2, range.width, range.height);
+                    
+                    // Show weapon swing arc
+                    if (this.weapon && this.attackAnimation > 0.5) {
+                        ctx.strokeStyle = '#ffff00';
+                        ctx.lineWidth = 4;
+                        ctx.beginPath();
+                        const startAngle = this.facing > 0 ? -Math.PI/4 : Math.PI - Math.PI/4;
+                        const endAngle = this.facing > 0 ? Math.PI/4 : Math.PI + Math.PI/4;
+                        ctx.arc(15 * this.facing, 10, 40, startAngle, endAngle);
+                        ctx.stroke();
+                    }
+                    
+                    ctx.restore();
+                }
+                
+                // Special effect when butt attack is ready
+                if (this.buttAttackReady && Math.sin(this.animTime * 5) > 0) {
+                    ctx.strokeStyle = '#ff1493';
+                    ctx.lineWidth = 3;
+                    ctx.strokeRect(-8, -8, 48, 64);
+                    
+                    // Level indicator
+                    ctx.fillStyle = '#00ff00';
+                    ctx.font = '12px Courier New';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(`LV.${this.level}`, 16, -15);
+                    ctx.textAlign = 'left';
+                }
+                
+                ctx.restore();
+                
+                // Health bar and experience bar above character
+                this.drawHealthBar(ctx);
+                this.drawExperienceBar(ctx);
+            }
+            
+            drawWeapon(ctx) {
+                ctx.save();
+                ctx.translate(this.facing > 0 ? 30 : -30, 15);
+                
+                if (this.weapon.type === 'bat') {
+                    ctx.fillStyle = '#8B4513';
+                    ctx.fillRect(-2, -20, 4, 35);
+                    ctx.fillRect(-6, -22, 12, 4);
+                } else if (this.weapon.type === 'knife') {
+                    ctx.fillStyle = '#C0C0C0';
+                    ctx.fillRect(-1, -18, 2, 28);
+                    ctx.fillStyle = '#8B4513';
+                    ctx.fillRect(-2, 8, 4, 10);
+                } else if (this.weapon.type === 'pipe') {
+                    ctx.fillStyle = '#696969';
+                    ctx.fillRect(-3, -20, 6, 35);
+                }
+                
+                ctx.restore();
+            }
+            
+            drawHealthBar(ctx) {
+                const barWidth = 40;
+                const barHeight = 6;
+                const barX = 0;
+                const barY = -15;
+                
+                // Background
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                ctx.fillRect(barX - 1, barY - 1, barWidth + 2, barHeight + 2);
+                
+                // Health bar
+                const healthPercent = this.health / this.maxHealth;
+                ctx.fillStyle = healthPercent > 0.5 ? '#00ff00' : healthPercent > 0.25 ? '#ffff00' : '#ff0000';
+                ctx.fillRect(barX, barY, barWidth * healthPercent, barHeight);
+                
+                // Butt attack cooldown indicator
+                if (!this.buttAttackReady) {
+                    const cooldownPercent = 1 - (this.buttAttackCooldown / 3.0);
+                    ctx.fillStyle = '#ff1493';
+                    ctx.fillRect(barX, barY + 8, barWidth * cooldownPercent, 3);
+                }
+            }
+            
+            drawExperienceBar(ctx) {
+                const barWidth = 40;
+                const barHeight = 4;
+                const barX = 0;
+                const barY = -25;
+                
+                // Background
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                ctx.fillRect(barX - 1, barY - 1, barWidth + 2, barHeight + 2);
+                
+                // Experience bar
+                const expPercent = this.experience / this.experienceToNext;
+                ctx.fillStyle = '#ffff00';
+                ctx.fillRect(barX, barY, barWidth * expPercent, barHeight);
+                
+                // Level text
+                ctx.fillStyle = '#00ff00';
+                ctx.font = '10px Courier New';
+                ctx.textAlign = 'center';
+                ctx.fillText(`LV.${this.level}`, barWidth/2, barY - 3);
+                ctx.textAlign = 'left';
+            }
+        }
+        
+        // Enemy Bum class
+        class EnemyBum extends GameObject {
+            constructor(x, y) {
+                super(x, y);
+                this.size = { width: 28, height: 44 };
+                this.health = 40;
+                this.maxHealth = 40;
+                this.speed = 150;
+                this.damage = 15;
+                this.facing = 1;
+                this.attackTimer = 0;
+                this.stunTimer = 0;
+                this.animTime = 0;
+                this.isAttacking = false;
+                this.target = null;
+                this.isDying = false;
+                this.deathAnimation = 0;
+                this.deathStarted = false;
+            }
+            
+            update(deltaTime) {
+                super.update(deltaTime);
+                this.animTime += deltaTime;
+                
+                // Handle death animation
+                if (this.isDying) {
+                    this.deathAnimation -= deltaTime * 2;
+                    if (this.deathAnimation <= 0) {
+                        this.destroyed = true;
+                    }
+                    return;
+                }
+                
+                if (this.attackTimer > 0) {
+                    this.attackTimer -= deltaTime;
+                    if (this.attackTimer <= 0) {
+                        this.isAttacking = false;
+                    }
+                }
+                
+                if (this.stunTimer > 0) {
+                    this.stunTimer -= deltaTime;
+                    return;
+                }
+                
+                // AI: Move towards player
+                if (this.target) {
+                    const dx = this.target.position.x - this.position.x;
+                    const dy = this.target.position.y - this.position.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance > 50) {
+                        // Move towards player
+                        this.facing = dx > 0 ? 1 : -1;
+                        this.position.x += (dx / distance) * this.speed * deltaTime;
+                        this.position.y += (dy / distance) * this.speed * deltaTime;
+                    } else if (distance < 60 && this.attackTimer <= 0) {
+                        // Attack player
+                        this.attack();
+                    }
+                }
+            }
+            
+            attack() {
+                this.isAttacking = true;
+                this.attackTimer = 0.6;
+                return {
+                    x: this.position.x + (this.facing * 30),
+                    y: this.position.y,
+                    damage: this.damage,
+                    width: 50,
+                    height: 30
+                };
+            }
+            
+            takeDamage(damage) {
+                this.health -= damage;
+                this.stunTimer = 0.3;
+                
+                if (this.health <= 0 && !this.isDying) {
+                    this.isDying = true;
+                    this.deathAnimation = 1.0;
+                    return true; // Dead
+                }
+                return false;
+            }
+            
+            draw(ctx) {
+                const stun = this.stunTimer > 0;
+                
+                ctx.save();
+                
+                // Death animation (fade and fall)
+                if (this.isDying) {
+                    ctx.globalAlpha = this.deathAnimation;
+                    ctx.translate(0, (1 - this.deathAnimation) * 20); // Fall down
+                    ctx.rotate((1 - this.deathAnimation) * 0.5); // Slight rotation
+                }
+                
+                // Body (dirty looking)
+                ctx.fillStyle = stun ? '#ffaaaa' : '#8B4513';
+                ctx.fillRect(6, 14, 16, 22);
+                
+                // Head
+                ctx.fillStyle = stun ? '#ffaaaa' : '#DEB887';
+                ctx.fillRect(8, 2, 12, 16);
+                
+                // Eyes (angry)
+                ctx.fillStyle = '#ff0000';
+                ctx.fillRect(10, 6, 2, 2);
+                ctx.fillRect(16, 6, 2, 2);
+                
+                // Mean mouth
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(11, 10, 6, 2);
+                
+                // Arms
+                ctx.fillStyle = stun ? '#ffaaaa' : '#DEB887';
+                if (this.isAttacking) {
+                    ctx.fillRect(22, 16, 8, 4); // Attacking arm
+                    ctx.fillRect(-2, 18, 8, 4);
+                } else {
+                    ctx.fillRect(2, 16, 6, 4);
+                    ctx.fillRect(20, 16, 6, 4);
+                }
+                
+                // Legs (torn pants)
+                ctx.fillStyle = '#654321';
+                ctx.fillRect(8, 36, 5, 8);
+                ctx.fillRect(15, 36, 5, 8);
+                
+                ctx.restore();
+                
+                // Health bar
+                this.drawHealthBar(ctx);
+            }
+            
+            drawHealthBar(ctx) {
+                const barWidth = 30;
+                const barHeight = 4;
+                const barX = 0;
+                const barY = -10;
+                
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                ctx.fillRect(barX - 1, barY - 1, barWidth + 2, barHeight + 2);
+                
+                const healthPercent = this.health / this.maxHealth;
+                ctx.fillStyle = healthPercent > 0.5 ? '#00ff00' : healthPercent > 0.25 ? '#ffff00' : '#ff0000';
+                ctx.fillRect(barX, barY, barWidth * healthPercent, barHeight);
+            }
+        }
+        
+        // Main Game Scene
+        class ButtFightsScene extends Scene {
+            constructor(engine) {
+                super('buttfights', engine);
+                this.player = null;
+                this.enemies = [];
+                this.bloodParticles = [];
+                this.tokens = [];
+                this.weapons = [];
+                this.score = 0;
+                this.wave = 1;
+                this.enemiesKilled = 0;
+                this.waveTimer = 0;
+                this.gameOver = false;
+                this.paused = false;
+                this.keys = {};
+                this.showingIntro = true;
+                this.totalTokens = 0;
+                this.totalDamageDealt = 0;
+                this.longestCombo = 0;
+                this.startTime = Date.now();
+                this.bloodSplatters = [];
+                this.bloodStains = []; // Permanent blood stains
+                this.bodyParts = []; // Flying body parts
+                this.damageIndicators = [];
+                this.eventQueue = [];
+                this.lastEventTime = 0;
+                this.skillTreeOpen = false;
+            }
+            
+            init() {
+                console.log('🥊 ButtFights by Aisatoshi - Starting!');
+                this.setupControls();
+                this.updateUI();
+            }
+            
+            setupControls() {
+                window.addEventListener('keydown', (e) => {
+                    this.keys[e.code] = true;
+                    
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        
+                        if (this.showingIntro) {
+                            this.startGame();
+                        } else {
+                            this.handlePunch();
+                        }
+                    }
+                    
+                    if (e.code === 'KeyF' && !this.showingIntro) {
+                        this.handleButtAttack();
+                    }
+                    
+                    if (e.code === 'Escape' && !this.showingIntro) {
+                        if (this.skillTreeOpen) {
+                            this.closeSkillTree();
+                        } else {
+                            this.paused = !this.paused;
+                        }
+                    }
+                    
+                    if (e.code === 'KeyT' && !this.showingIntro && !this.paused) {
+                        this.openSkillTree();
+                    }
+                });
+                
+                window.addEventListener('keyup', (e) => {
+                    this.keys[e.code] = false;
+                });
+            }
+            
+            startGame() {
+                this.showingIntro = false;
+                document.getElementById('introScreen').style.display = 'none';
+                
+                // Switch from Star Wars to Limp Bizkit music
+                const introMusic = document.getElementById('introMusic');
+                const gameMusic = document.getElementById('gameMusic');
+                
+                introMusic.pause();
+                gameMusic.currentTime = 0;
+                gameMusic.play().catch(e => console.log('Audio autoplay blocked:', e));
+                
+                this.spawnPlayer();
+                this.spawnWave();
+                this.logEvent('🎮 GAME START - The Token Awakens!', '#00ff00');
+            }
+            
+            logEvent(message, color = '#ffff00') {
+                const eventElement = document.getElementById('eventText');
+                eventElement.textContent = message;
+                eventElement.style.color = color;
+                eventElement.classList.remove('scrolling-text');
+                void eventElement.offsetWidth; // Force reflow
+                eventElement.classList.add('scrolling-text');
+            }
+            
+            openSkillTree() {
+                this.skillTreeOpen = true;
+                this.paused = true;
+                document.getElementById('skillTree').style.display = 'block';
+                this.updateSkillTree();
+            }
+            
+            closeSkillTree() {
+                this.skillTreeOpen = false;
+                this.paused = false;
+                document.getElementById('skillTree').style.display = 'none';
+            }
+            
+            updateSkillTree() {
+                if (!this.player) return;
+                
+                document.getElementById('skillPoints').textContent = `Skill Points: ${this.player.skillPoints}`;
+                
+                const skillsHtml = `
+                    <div class="skill-node ${this.player.skills.damage > 0 ? 'purchased' : ''}" onclick="game.purchaseSkill('damage')">
+                        <strong>💪 Power Strike</strong><br>
+                        Level: ${this.player.skills.damage}<br>
+                        +10 damage per level<br>
+                        Cost: 1 skill point
+                    </div>
+                    <div class="skill-node ${this.player.skills.health > 0 ? 'purchased' : ''}" onclick="game.purchaseSkill('health')">
+                        <strong>❤️ Vitality</strong><br>
+                        Level: ${this.player.skills.health}<br>
+                        +50 max health per level<br>
+                        Cost: 1 skill point
+                    </div>
+                    <div class="skill-node ${this.player.skills.speed > 0 ? 'purchased' : ''}" onclick="game.purchaseSkill('speed')">
+                        <strong>🏃 Agility</strong><br>
+                        Level: ${this.player.skills.speed}<br>
+                        +50 movement speed per level<br>
+                        Cost: 1 skill point
+                    </div>
+                    <div class="skill-node ${this.player.skills.critChance > 0 ? 'purchased' : ''}" onclick="game.purchaseSkill('critChance')">
+                        <strong>🎯 Critical Strike</strong><br>
+                        Level: ${this.player.skills.critChance}<br>
+                        +5% crit chance per level<br>
+                        Cost: 1 skill point
+                    </div>
+                    <div class="skill-node ${this.player.skills.comboMaster > 0 ? 'purchased' : ''}" onclick="game.purchaseSkill('comboMaster')">
+                        <strong>🔥 Combo Master</strong><br>
+                        Level: ${this.player.skills.comboMaster}<br>
+                        +10% combo damage per level<br>
+                        Cost: 1 skill point
+                    </div>
+                    <div class="skill-node ${this.player.skills.bloodlust > 0 ? 'purchased' : ''}" onclick="game.purchaseSkill('bloodlust')">
+                        <strong>🩸 Bloodlust</strong><br>
+                        Level: ${this.player.skills.bloodlust}<br>
+                        Heal ${5 * this.player.skills.bloodlust} HP on kill<br>
+                        Cost: 1 skill point
+                    </div>
+                `;
+                
+                document.getElementById('skillNodes').innerHTML = skillsHtml;
+            }
+            
+            purchaseSkill(skillName) {
+                if (this.player && this.player.purchaseSkill(skillName)) {
+                    this.logEvent(`🌟 Skill Upgraded: ${skillName.toUpperCase()}!`, '#00ff00');
+                    this.updateSkillTree();
+                }
+            }
+            
+            spawnPlayer() {
+                this.player = new Aisatoshi(512, 400);
+                this.addGameObject(this.player);
+            }
+            
+            spawnWave() {
+                console.log(`🌊 Wave ${this.wave} - Spawn ${2 + this.wave} bums!`);
+                
+                const enemyCount = 2 + this.wave;
+                for (let i = 0; i < enemyCount; i++) {
+                    const x = Math.random() > 0.5 ? -50 : 1074; // Spawn from sides
+                    const y = 200 + Math.random() * 400;
+                    const enemy = new EnemyBum(x, y);
+                    enemy.target = this.player;
+                    this.enemies.push(enemy);
+                    this.addGameObject(enemy);
+                }
+            }
+            
+            handlePunch() {
+                if (this.paused || this.gameOver) return;
+                
+                const attack = this.player.punch();
+                if (attack) {
+                    // Check for hits on enemies
+                    this.enemies.forEach(enemy => {
+                        if (this.checkCollision(attack, enemy)) {
+                            const isDead = enemy.takeDamage(attack.damage);
+                            
+                            // Damage indicator
+                            this.damageIndicators.push(new DamageIndicator(
+                                enemy.position.x, 
+                                enemy.position.y - 10, 
+                                attack.damage, 
+                                attack.isCritical
+                            ));
+                            
+                            // Enhanced blood effects
+                            this.createBloodSplatter(enemy.position.x, enemy.position.y, attack.damage, attack.isCritical);
+                            
+                            // Permanent blood stains
+                            const stainCount = attack.isCritical ? 2 : 1;
+                            for (let i = 0; i < stainCount; i++) {
+                                const offsetX = (Math.random() - 0.5) * 30;
+                                const offsetY = (Math.random() - 0.5) * 30;
+                                this.bloodStains.push(new BloodStain(
+                                    enemy.position.x + offsetX, 
+                                    enemy.position.y + offsetY, 
+                                    attack.isCritical ? 2 : 1
+                                ));
+                            }
+                            
+                            // Experience and event logging
+                            const expGain = attack.isCritical ? 15 : 8;
+                            this.player.gainExperience(expGain);
+                            this.totalDamageDealt += attack.damage;
+                            
+                            if (attack.isCritical) {
+                                this.logEvent(`💀 CRITICAL HIT! ${attack.damage} damage!`, '#ff0000');
+                            }
+                            
+                            // Check for level up
+                            if (this.player.levelUp()) {
+                                this.logEvent(`⭐ LEVEL UP! Aisatoshi reached level ${this.player.level}!`, '#00ff00');
+                            }
+                            
+                            if (isDead) {
+                                this.killEnemy(enemy);
+                            }
+                        }
+                    });
+                }
+            }
+            
+            handleButtAttack() {
+                if (this.paused || this.gameOver) return;
+                
+                const attack = this.player.buttAttack();
+                if (attack) {
+                    console.log('🍑 SPECIAL BUTT ATTACK!');
+                    
+                    // Damage all nearby enemies
+                    this.enemies.forEach(enemy => {
+                        const distance = Math.sqrt(
+                            Math.pow(enemy.position.x - attack.x, 2) + 
+                            Math.pow(enemy.position.y - attack.y, 2)
+                        );
+                        
+                        if (distance < 100) {
+                            const isDead = enemy.takeDamage(attack.damage);
+                            this.createBloodSplatter(enemy.position.x, enemy.position.y, attack.damage, true);
+                            
+                            if (isDead) {
+                                this.killEnemy(enemy);
+                            }
+                        }
+                    });
+                }
+            }
+            
+            checkCollision(attack, enemy) {
+                return attack.x < enemy.position.x + enemy.size.width &&
+                       attack.x + attack.width > enemy.position.x &&
+                       attack.y < enemy.position.y + enemy.size.height &&
+                       attack.y + attack.height > enemy.position.y;
+            }
+            
+            createBloodSplatter(x, y, intensity, isCritical = false) {
+                // Flying blood particles
+                const particleCount = isCritical ? intensity / 2 : intensity / 8;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = isCritical ? 200 + Math.random() * 300 : 100 + Math.random() * 200;
+                    const vx = Math.cos(angle) * speed;
+                    const vy = Math.sin(angle) * speed - 50;
+                    
+                    this.bloodParticles.push(new BloodParticle(x, y, vx, vy));
+                }
+                
+                // Ground blood splatters (sticky)
+                const splatterCount = isCritical ? 3 + Math.random() * 4 : 1 + Math.random() * 2;
+                for (let i = 0; i < splatterCount; i++) {
+                    const offsetX = (Math.random() - 0.5) * 40;
+                    const offsetY = (Math.random() - 0.5) * 40;
+                    const size = isCritical ? 2 + Math.random() * 2 : 1;
+                    this.bloodSplatters.push(new BloodSplatter(x + offsetX, y + offsetY, size));
+                }
+            }
+            
+            killEnemy(enemy) {
+                const scoreGain = Math.floor(100 * this.player.comboMultiplier);
+                this.score += scoreGain;
+                this.enemiesKilled++;
+                
+                // EXTREME GORE - Body parts flying everywhere!
+                const bodyPartTypes = ['head', 'arm', 'arm', 'leg', 'leg', 'torso'];
+                bodyPartTypes.forEach((partType, i) => {
+                    setTimeout(() => {
+                        const part = new BodyPart(
+                            enemy.position.x + (Math.random() - 0.5) * 20,
+                            enemy.position.y + (Math.random() - 0.5) * 20,
+                            partType
+                        );
+                        this.bodyParts.push(part);
+                    }, i * 50); // Stagger the gore
+                });
+                
+                // Massive blood explosion
+                for (let i = 0; i < 15; i++) {
+                    const offsetX = (Math.random() - 0.5) * 60;
+                    const offsetY = (Math.random() - 0.5) * 60;
+                    this.bloodStains.push(new BloodStain(
+                        enemy.position.x + offsetX,
+                        enemy.position.y + offsetY,
+                        2 + Math.random() * 2
+                    ));
+                }
+                
+                // Experience for kills
+                this.player.gainExperience(25);
+                
+                // Bloodlust healing
+                if (this.player.skills.bloodlust > 0) {
+                    const healAmount = this.player.skills.bloodlust * 5;
+                    this.player.health = Math.min(this.player.maxHealth, this.player.health + healAmount);
+                    if (healAmount > 0) {
+                        this.logEvent(`🩸 Bloodlust! Healed ${healAmount} HP!`, '#ff1493');
+                    }
+                }
+                
+                // Check for combo milestones
+                if (this.player.combo >= 10 && this.player.combo % 5 === 0) {
+                    this.logEvent(`🔥 ${this.player.combo}x COMBO! Aisatoshi is on fire!`, '#ff6600');
+                }
+                
+                // Drop tokens (more at higher levels)
+                const baseTokens = 2 + Math.floor(this.player.level / 3);
+                const tokenCount = baseTokens + Math.floor(Math.random() * 3);
+                for (let i = 0; i < tokenCount; i++) {
+                    const token = new Token(
+                        enemy.position.x + (Math.random() - 0.5) * 50,
+                        enemy.position.y + (Math.random() - 0.5) * 20
+                    );
+                    this.tokens.push(token);
+                }
+                
+                // Better weapon drop rates at higher levels
+                const weaponChance = 0.12 + (this.player.level * 0.02);
+                if (Math.random() < weaponChance) {
+                    const weaponTypes = ['bat', 'knife', 'pipe'];
+                    const weaponType = weaponTypes[Math.floor(Math.random() * weaponTypes.length)];
+                    const weapon = new Weapon(
+                        enemy.position.x,
+                        enemy.position.y - 20,
+                        weaponType
+                    );
+                    this.weapons.push(weapon);
+                    this.logEvent(`⚔️ Weapon dropped: ${weapon.name}!`, '#00ff00');
+                }
+                
+                const index = this.enemies.indexOf(enemy);
+                if (index > -1) {
+                    this.enemies.splice(index, 1);
+                }
+                
+                this.removeGameObject(enemy);
+                
+                // Check if wave complete
+                if (this.enemies.length === 0) {
+                    this.wave++;
+                    this.waveTimer = 2.0;
+                    this.logEvent(`🌊 Wave ${this.wave - 1} Complete! Preparing wave ${this.wave}...`, '#05d9e8');
+                }
+            }
+            
+            update(deltaTime) {
+                if (this.paused || this.showingIntro) return;
+                
+                if (this.gameOver) {
+                    // Game over logic
+                    return;
+                }
+                
+                // Handle input
+                this.handleMovement(deltaTime);
+                
+                // Update game objects
+                super.update(deltaTime);
+                
+                // Update blood particles and splatters
+                this.bloodParticles = this.bloodParticles.filter(particle => {
+                    particle.update(deltaTime);
+                    return particle.life > 0;
+                });
+                
+                this.bloodSplatters = this.bloodSplatters.filter(splatter => {
+                    splatter.update(deltaTime);
+                    return splatter.life > 0;
+                });
+                
+                // Update damage indicators
+                this.damageIndicators = this.damageIndicators.filter(indicator => {
+                    indicator.update(deltaTime);
+                    return indicator.life > 0;
+                });
+                
+                // Blood stains are permanent, but update them anyway
+                this.bloodStains.forEach(stain => {
+                    stain.update(deltaTime);
+                });
+                
+                // Update body parts
+                this.bodyParts.forEach(part => {
+                    part.update(deltaTime);
+                });
+                
+                // Update tokens
+                this.tokens = this.tokens.filter(token => {
+                    token.update(deltaTime);
+                    
+                    // Check for pickup
+                    const distance = Math.sqrt(
+                        Math.pow(token.x - this.player.position.x, 2) +
+                        Math.pow(token.y - this.player.position.y, 2)
+                    );
+                    
+                    if (distance < 25 && !token.collected) {
+                        token.collected = true;
+                        this.player.addTokens(1);
+                        this.totalTokens++;
+                        this.score += 10;
+                        return false;
+                    }
+                    
+                    return token.life > 0 && !token.collected;
+                });
+                
+                // Update weapons
+                this.weapons = this.weapons.filter(weapon => {
+                    weapon.update(deltaTime);
+                    
+                    // Check for pickup
+                    const distance = Math.sqrt(
+                        Math.pow(weapon.x - this.player.position.x, 2) +
+                        Math.pow(weapon.y - this.player.position.y, 2)
+                    );
+                    
+                    if (distance < 30 && !weapon.collected) {
+                        this.player.pickupWeapon(weapon);
+                        return false;
+                    }
+                    
+                    return weapon.life > 0 && !weapon.collected;
+                });
+                
+                // Handle enemy attacks
+                this.enemies.forEach(enemy => {
+                    if (enemy.isAttacking) {
+                        const attack = {
+                            x: enemy.position.x + (enemy.facing * 30),
+                            y: enemy.position.y,
+                            width: 50,
+                            height: 30
+                        };
+                        
+                        if (this.checkCollision(attack, this.player)) {
+                            const isDead = this.player.takeDamage(enemy.damage);
+                            if (isDead) {
+                                this.gameOver = true;
+                                console.log('💀 Game Over! Aisatoshi has been defeated!');
+                            }
+                        }
+                    }
+                });
+                
+                // Wave management
+                if (this.waveTimer > 0) {
+                    this.waveTimer -= deltaTime;
+                    if (this.waveTimer <= 0) {
+                        this.spawnWave();
+                    }
+                }
+                
+                // Keep player in bounds (fullscreen)
+                this.player.position.x = Math.max(16, Math.min(window.innerWidth - 16, this.player.position.x));
+                this.player.position.y = Math.max(24, Math.min(window.innerHeight - 24, this.player.position.y));
+                
+                // Update stats
+                this.longestCombo = Math.max(this.longestCombo, this.player.combo);
+                
+                // Update UI
+                this.updateUI();
+            }
+            
+            handleMovement(deltaTime) {
+                let dx = 0, dy = 0;
+                
+                if (this.keys['KeyA'] || this.keys['ArrowLeft']) {
+                    dx -= 1;
+                    this.player.facing = -1;
+                }
+                if (this.keys['KeyD'] || this.keys['ArrowRight']) {
+                    dx += 1;
+                    this.player.facing = 1;
+                }
+                if (this.keys['KeyW'] || this.keys['ArrowUp']) {
+                    dy -= 1;
+                }
+                if (this.keys['KeyS'] || this.keys['ArrowDown']) {
+                    dy += 1;
+                }
+                
+                // Normalize diagonal movement
+                if (dx !== 0 && dy !== 0) {
+                    dx *= 0.707;
+                    dy *= 0.707;
+                }
+                
+                this.player.position.x += dx * this.player.speed * deltaTime;
+                this.player.position.y += dy * this.player.speed * deltaTime;
+            }
+            
+            render(ctx) {
+                if (this.showingIntro) {
+                    return; // Don't render game during intro
+                }
+                
+                // Clear canvas with dark background (fullscreen)
+                ctx.fillStyle = '#1a0f08';
+                ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+                
+                // Render street background pattern
+                this.renderBackground(ctx);
+                
+                // Render permanent blood stains first (behind everything)
+                this.bloodStains.forEach(stain => {
+                    stain.render(ctx);
+                });
+                
+                // Render flying blood splatters
+                this.bloodSplatters.forEach(splatter => {
+                    splatter.render(ctx);
+                });
+                
+                // Render body parts (on ground layer)
+                this.bodyParts.forEach(part => {
+                    part.render(ctx);
+                });
+                
+                // Render game objects
+                super.render(ctx);
+                
+                // Render tokens
+                this.tokens.forEach(token => {
+                    token.render(ctx);
+                });
+                
+                // Render weapons
+                this.weapons.forEach(weapon => {
+                    weapon.render(ctx);
+                });
+                
+                // Render blood particles
+                this.bloodParticles.forEach(particle => {
+                    particle.render(ctx);
+                });
+                
+                // Render damage indicators (on top)
+                this.damageIndicators.forEach(indicator => {
+                    indicator.render(ctx);
+                });
+                
+                if (this.paused) {
+                    this.renderPauseScreen(ctx);
+                }
+                
+                if (this.gameOver) {
+                    this.renderGameOverScreen(ctx);
+                }
+            }
+            
+            updateUI() {
+                const gameTime = Math.floor((Date.now() - this.startTime) / 1000);
+                const minutes = Math.floor(gameTime / 60);
+                const seconds = gameTime % 60;
+                
+                const statsHtml = `
+                    <div style="color: #ffff00; font-size: 20px; margin-bottom: 8px;"><strong>💰 Score: ${this.score.toLocaleString()}</strong></div>
+                    <div style="color: #00ff00; font-size: 18px;">🌊 Wave: ${this.wave}</div>
+                    <div style="color: #ff6600; font-size: 16px;">👹 Enemies: ${this.enemies.length}</div>
+                    <div style="color: #ffd700; font-size: 16px;">🪙 Tokens: ${this.player ? this.player.tokens : 0}</div>
+                    <div style="color: #ff1493; font-size: 16px;">💀 Kills: ${this.enemiesKilled}</div>
+                    <div style="color: #05d9e8; font-size: 16px;">🔥 Best Combo: ${this.longestCombo}x</div>
+                    <div style="color: #ff0000; font-size: 16px;">⚔️ Total Damage: ${this.totalDamageDealt.toLocaleString()}</div>
+                    <div style="color: #ddd; font-size: 16px;">⏰ Time: ${minutes}:${seconds.toString().padStart(2, '0')}</div>
+                `;
+                
+                if (!this.player) return;
+                
+                const expPercent = Math.floor((this.player.experience / this.player.experienceToNext) * 100);
+                const weaponsHtml = `
+                    <div style="color: #00ff00; font-size: 22px; margin-bottom: 12px;"><strong>⭐ Level ${this.player.level}</strong></div>
+                    <div style="color: #ffff00; font-size: 16px; margin-bottom: 10px;">EXP: ${this.player.experience}/${this.player.experienceToNext}</div>
+                    <div style="color: #ffff00; font-size: 14px; margin-bottom: 10px;">Progress: ${expPercent}%</div>
+                    <div style="color: #05d9e8; font-size: 16px; margin-bottom: 12px;">💪 Skill Points: ${this.player.skillPoints}</div>
+                    <div style="color: #ff1493; font-size: 14px; margin-bottom: 10px;">Press T for Skills!</div>
+                    ${this.player.weapon ? 
+                        `<div style="color: #00ff00; font-size: 18px; margin-bottom: 5px;"><strong>⚔️ ${this.player.weapon.name}</strong></div>
+                         <div style="color: #ffaa00; font-size: 16px;">+${this.player.weapon.damage} damage bonus</div>` :
+                        `<div style="color: #666; font-size: 16px;">No weapon equipped</div>
+                         <div style="color: #999; font-size: 14px;">Walk over weapons to equip</div>`}
+                `;
+                
+                document.getElementById('gameStats').innerHTML = statsHtml;
+                document.getElementById('weaponStats').innerHTML = weaponsHtml;
+            }
+            
+            renderBackground(ctx) {
+                // Simple street pattern (fullscreen)
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 2;
+                
+                // Horizontal lines
+                for (let y = 100; y < window.innerHeight; y += 100) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(window.innerWidth, y);
+                    ctx.stroke();
+                }
+                
+                // Vertical lines
+                for (let x = 100; x < window.innerWidth; x += 150) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 100);
+                    ctx.lineTo(x, window.innerHeight);
+                    ctx.stroke();
+                }
+            }
+            
+            renderUI(ctx) {
+                ctx.fillStyle = 'white';
+                ctx.font = '20px Courier New';
+                ctx.fillText(`Score: ${this.score}`, 20, 30);
+                ctx.fillText(`Wave: ${this.wave}`, 20, 55);
+                ctx.fillText(`Enemies: ${this.enemies.length}`, 20, 80);
+                
+                // Wave countdown
+                if (this.waveTimer > 0) {
+                    ctx.fillStyle = '#ff1493';
+                    ctx.font = '36px Courier New';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(`Next Wave: ${Math.ceil(this.waveTimer)}`, 512, 400);
+                    ctx.textAlign = 'left';
+                }
+                
+                // Combo display
+                if (this.player.combo > 1) {
+                    ctx.fillStyle = '#ff6600';
+                    ctx.font = '24px Courier New';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(`Combo: ${this.player.combo}x`, 1000, 30);
+                    ctx.textAlign = 'left';
+                }
+            }
+            
+            renderPauseScreen(ctx) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '48px Courier New';
+                ctx.textAlign = 'center';
+                ctx.fillText('PAUSED', window.innerWidth / 2, window.innerHeight / 2);
+                ctx.font = '24px Courier New';
+                ctx.fillText('Press ESC to continue', window.innerWidth / 2, window.innerHeight / 2 + 40);
+                ctx.textAlign = 'left';
+            }
+            
+            renderGameOverScreen(ctx) {
+                ctx.fillStyle = 'rgba(139, 0, 0, 0.8)';
+                ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+                
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                
+                ctx.fillStyle = '#ff1493';
+                ctx.font = '48px Courier New';
+                ctx.textAlign = 'center';
+                ctx.fillText('GAME OVER', centerX, centerY - 100);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '24px Courier New';
+                ctx.fillText(`Final Score: ${this.score}`, centerX, centerY - 50);
+                ctx.fillText(`Waves Survived: ${this.wave - 1}`, centerX, centerY - 20);
+                ctx.fillText(`Enemies Defeated: ${this.enemiesKilled}`, centerX, centerY + 10);
+                ctx.fillText(`Tokens Collected: ${this.totalTokens}`, centerX, centerY + 40);
+                ctx.fillText(`Best Combo: ${this.longestCombo}x`, centerX, centerY + 70);
+                
+                ctx.fillStyle = '#ff6600';
+                ctx.fillText('Refresh to play again!', centerX, centerY + 120);
+                
+                ctx.textAlign = 'left';
+            }
+        }
+        
+        // Simple MIDI-style audio system
+        class MIDIAudio {
+            constructor() {
+                this.context = null;
+                this.currentOscillators = [];
+                this.currentSong = null;
+                this.isPlaying = false;
+                this.audioEnabled = false;
+                this.initAudio();
+            }
+            
+            initAudio() {
+                // Create audio context but don't start until user interaction
+                this.setupAudioContext();
+            }
+            
+            setupAudioContext() {
+                try {
+                    this.context = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('Web Audio API not supported');
+                }
+            }
+            
+            async enableAudio() {
+                if (this.context && this.context.state === 'suspended') {
+                    await this.context.resume();
+                }
+                this.audioEnabled = true;
+            }
+            
+            playTone(frequency, duration, volume = 0.1) {
+                if (!this.context || !this.audioEnabled) return;
+                
+                const oscillator = this.context.createOscillator();
+                const gainNode = this.context.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.context.destination);
+                
+                oscillator.frequency.setValueAtTime(frequency, this.context.currentTime);
+                oscillator.type = 'square';
+                
+                gainNode.gain.setValueAtTime(0, this.context.currentTime);
+                gainNode.gain.linearRampToValueAtTime(volume, this.context.currentTime + 0.01);
+                gainNode.gain.linearRampToValueAtTime(0, this.context.currentTime + duration);
+                
+                oscillator.start(this.context.currentTime);
+                oscillator.stop(this.context.currentTime + duration);
+                
+                this.currentOscillators.push(oscillator);
+            }
+            
+            playStarWarsTheme() {
+                if (!this.context || !this.audioEnabled) return;
+                
+                this.stopAll();
+                this.isPlaying = true;
+                
+                // Simplified Star Wars main theme melody
+                const melody = [
+                    {note: 392, duration: 0.5}, // G
+                    {note: 392, duration: 0.5}, // G
+                    {note: 392, duration: 0.5}, // G
+                    {note: 523, duration: 1.5}, // C
+                    {note: 784, duration: 1.5}, // G (octave)
+                    {note: 698, duration: 0.5}, // F
+                    {note: 659, duration: 0.5}, // E
+                    {note: 587, duration: 0.5}, // D
+                    {note: 1047, duration: 1.5}, // C (octave)
+                    {note: 784, duration: 1.0}, // G
+                ];
+                
+                let delay = 0;
+                melody.forEach((note, i) => {
+                    if (this.isPlaying) {
+                        setTimeout(() => {
+                            this.playTone(note.note, note.duration, 0.15);
+                        }, delay * 1000);
+                        delay += note.duration;
+                    }
+                });
+                
+                // Loop the theme
+                setTimeout(() => {
+                    if (this.isPlaying) {
+                        this.playStarWarsTheme();
+                    }
+                }, delay * 1000 + 1000);
+            }
+            
+            playLimpBizkitStyle() {
+                if (!this.context || !this.audioEnabled) return;
+                
+                this.stopAll();
+                this.isPlaying = true;
+                
+                // Heavy, aggressive beat pattern
+                const pattern = () => {
+                    if (!this.isPlaying) return;
+                    
+                    // Heavy bass-like tones
+                    this.playTone(65, 0.2, 0.2);   // Low E
+                    setTimeout(() => this.playTone(82, 0.2, 0.2), 200);  // Low A
+                    setTimeout(() => this.playTone(65, 0.3, 0.2), 400);  // Low E
+                    setTimeout(() => this.playTone(73, 0.2, 0.2), 700);  // Low D
+                    
+                    // Repeat pattern
+                    setTimeout(() => {
+                        if (this.isPlaying) pattern();
+                    }, 1000);
+                };
+                
+                pattern();
+            }
+            
+            stopAll() {
+                this.isPlaying = false;
+                this.currentOscillators.forEach(osc => {
+                    try {
+                        osc.stop();
+                    } catch (e) {}
+                });
+                this.currentOscillators = [];
+            }
+        }
+        
+        // Global music system
+        const midiAudio = new MIDIAudio();
+        
+        // Global game reference for skill tree
+        let game = null;
+        
+        // Close skill tree function
+        function closeSkillTree() {
+            if (game) {
+                game.closeSkillTree();
+            }
+        }
+        
+        // Initialize the game
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                console.log('🎮 Initializing ButtFights by Aisatoshi...');
+                
+                // Disable built-in MIDIAudio system - use HTML audio elements instead
+                midiAudio.audioEnabled = false;
+                
+                // HTML audio elements will auto-start via autoplay attribute
+                
+                // Set canvas to fullscreen
+                const canvas = document.getElementById('gameCanvas');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                
+                const engine = new GameEngine('gameCanvas', {
+                    fps: 60,
+                    responsive: true
+                });
+                
+                const scene = new ButtFightsScene(engine);
+                game = scene; // Store global reference
+                engine.addScene('buttfights', scene);
+                engine.switchScene('buttfights');
+                engine.start();
+                
+                console.log('🥊 ButtFights is ready! Aisatoshi, go beat some butts!');
+                
+            } catch (error) {
+                console.error('Failed to initialize ButtFights:', error);
+            }
+        });
+    </script>
+</body>
+</html>

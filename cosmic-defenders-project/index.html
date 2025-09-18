@@ -62,6 +62,11 @@
                     <span id="enemiesRemaining">0</span>
                     <span class="wave-status-label">ENEMIES</span>
                 </div>
+                <div class="top-score-pill">
+                    <div class="score-label">SCORE</div>
+                    <div id="scoreValue" class="score-value">0</div>
+                    <div class="multiplier">x<span id="multiplier">1</span></div>
+                </div>
             </div>
         </div>
 
@@ -114,41 +119,36 @@
             <div class="hud-overlay">
                 <!-- Top HUD -->
                 <div class="hud-top">
-                    <div class="resource-panel">
-                        <div class="resource-item">
-                            <svg width="30" height="30" class="resource-icon">
-                                <polygon points="15,5 25,15 15,25 5,15" fill="#00ffff" stroke="#ffffff" stroke-width="2"/>
-                            </svg>
-                            <span class="resource-label">💎</span>
-                            <span id="crystalCount" class="resource-value">1000</span>
+                    <div class="resource-panel-compact">
+                        <div class="resource-row">
+                            <div class="resource-item-small">
+                                <span class="resource-label">💎</span>
+                                <span id="crystalCount" class="resource-value">1000</span>
+                            </div>
+                            <div class="resource-item-small">
+                                <span class="resource-label">🔬</span>
+                                <span id="techCount" class="resource-value">0</span>
+                            </div>
+                            <div class="resource-item-small">
+                                <span class="resource-label">✦</span>
+                                <span id="essenceCount" class="resource-value">0</span>
+                            </div>
                         </div>
-                        <div class="resource-item">
-                            <span class="resource-label">🔬</span>
-                            <span id="techCount" class="resource-value">0</span>
-                        </div>
-                        <div class="resource-item">
-                            <span class="resource-label">✦</span>
-                            <span id="essenceCount" class="resource-value">0</span>
-                        </div>
-                        <div class="resource-item">
-                            <span class="resource-label">◆</span>
-                            <span id="fragmentCount" class="resource-value">0</span>
-                        </div>
-                        <div class="resource-item">
-                            <span class="resource-label">⬢</span>
-                            <span id="coreCount" class="resource-value">0</span>
+                        <div class="resource-row">
+                            <div class="resource-item-small">
+                                <span class="resource-label">◆</span>
+                                <span id="fragmentCount" class="resource-value">0</span>
+                            </div>
+                            <div class="resource-item-small">
+                                <span class="resource-label">⬢</span>
+                                <span id="coreCount" class="resource-value">0</span>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Right Side Panels -->
                 <div class="right-side-panels">
-                    <div class="score-display">
-                        <div class="score-label">SCORE</div>
-                        <div id="scoreValue" class="score-value">0</div>
-                        <div class="multiplier">x<span id="multiplier">1</span></div>
-                    </div>
-                    
                     <!-- Game Stats Panel -->
                     <div class="game-stats-panel">
                         <h3 class="stats-title">MISSION STATUS</h3>
@@ -206,53 +206,53 @@
                         <button id="skillTreeToggle" class="upgrade-toggle-btn" title="Open Upgrades">⚡</button>
                     </div>
                     
-                    <div class="tower-grid-expanded">
+                    <div class="tower-grid-single">
                         <!-- Laser Tower -->
-                        <div class="tower-card" data-tower="laser">
-                            <svg class="tower-preview" width="60" height="60">
-                                <rect x="20" y="40" width="20" height="15" fill="#666"/>
-                                <circle cx="30" cy="30" r="15" fill="#0088ff" stroke="#00ffff" stroke-width="2"/>
-                                <line x1="30" y1="15" x2="30" y2="5" stroke="#00ffff" stroke-width="3"/>
+                        <div class="tower-card-compact" data-tower="laser">
+                            <svg class="tower-preview-small" width="40" height="40">
+                                <rect x="15" y="30" width="10" height="8" fill="#666"/>
+                                <circle cx="20" cy="20" r="10" fill="#0088ff" stroke="#00ffff" stroke-width="2"/>
+                                <line x1="20" y1="10" x2="20" y2="5" stroke="#00ffff" stroke-width="2"/>
                             </svg>
-                            <div class="tower-info">
+                            <div class="tower-info-compact">
                                 <div class="tower-name">Laser</div>
                                 <div class="tower-cost">💎 100</div>
                             </div>
                         </div>
                         
                         <!-- Missile Tower -->
-                        <div class="tower-card" data-tower="missile">
-                            <svg class="tower-preview" width="60" height="60">
-                                <rect x="15" y="35" width="30" height="20" fill="#888"/>
-                                <polygon points="30,10 40,30 20,30" fill="#ff6600" stroke="#ffaa00" stroke-width="2"/>
+                        <div class="tower-card-compact" data-tower="missile">
+                            <svg class="tower-preview-small" width="40" height="40">
+                                <rect x="10" y="25" width="20" height="12" fill="#888"/>
+                                <polygon points="20,8 26,20 14,20" fill="#ff6600" stroke="#ffaa00" stroke-width="1"/>
                             </svg>
-                            <div class="tower-info">
+                            <div class="tower-info-compact">
                                 <div class="tower-name">Missile</div>
                                 <div class="tower-cost">💎 200</div>
                             </div>
                         </div>
                         
                         <!-- Plasma Tower -->
-                        <div class="tower-card" data-tower="plasma">
-                            <svg class="tower-preview" width="60" height="60">
-                                <hexagon cx="30" cy="30" r="20" fill="#ff00ff" stroke="#ff88ff" stroke-width="2"/>
-                                <circle cx="30" cy="30" r="8" fill="#ffffff"/>
+                        <div class="tower-card-compact" data-tower="plasma">
+                            <svg class="tower-preview-small" width="40" height="40">
+                                <circle cx="20" cy="20" r="14" fill="#ff00ff" stroke="#ff88ff" stroke-width="2"/>
+                                <circle cx="20" cy="20" r="6" fill="#ffffff"/>
                             </svg>
-                            <div class="tower-info">
+                            <div class="tower-info-compact">
                                 <div class="tower-name">Plasma</div>
                                 <div class="tower-cost">💎 350</div>
                             </div>
                         </div>
                         
                         <!-- Tesla Tower -->
-                        <div class="tower-card" data-tower="tesla">
-                            <svg class="tower-preview" width="60" height="60">
-                                <rect x="25" y="35" width="10" height="20" fill="#999"/>
-                                <circle cx="30" cy="25" r="15" fill="none" stroke="#ffff00" stroke-width="3"/>
-                                <circle cx="30" cy="25" r="10" fill="none" stroke="#ffff00" stroke-width="2"/>
-                                <circle cx="30" cy="25" r="5" fill="#ffffff"/>
+                        <div class="tower-card-compact" data-tower="tesla">
+                            <svg class="tower-preview-small" width="40" height="40">
+                                <rect x="18" y="28" width="4" height="10" fill="#999"/>
+                                <circle cx="20" cy="18" r="10" fill="none" stroke="#ffff00" stroke-width="2"/>
+                                <circle cx="20" cy="18" r="6" fill="none" stroke="#ffff00" stroke-width="1"/>
+                                <circle cx="20" cy="18" r="3" fill="#ffffff"/>
                             </svg>
-                            <div class="tower-info">
+                            <div class="tower-info-compact">
                                 <div class="tower-name">Tesla</div>
                                 <div class="tower-cost">💎 500</div>
                             </div>
