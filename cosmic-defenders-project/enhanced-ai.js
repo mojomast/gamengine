@@ -449,5 +449,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 30000);
     
-    Toast.info('AI Enhanced', 'Advanced combat systems online');
+    // AI systems initialized silently
 });

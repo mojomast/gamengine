@@ -113,6 +113,79 @@
             
             <!-- Toast Notification Container -->
             <div id="toastContainer" class="toast-container"></div>
+            
+            <!-- Music Player (Winamp Style) - Now positioned below game canvas -->
+            <div class="music-player">
+                <div class="player-display">
+                    <div class="player-title">♪ COSMIC JUKEBOX ♪</div>
+                    <div class="track-info">
+                        <div class="track-number">TRACK <span id="trackNumber">01</span>/12</div>
+                        <div class="track-name" id="trackName">Cosmic Drift</div>
+                        <div class="track-time">
+                            <span id="trackTime">0:00</span> / <span id="trackDuration">∞</span>
+                        </div>
+                    </div>
+                    <div class="visualizer">
+                        <div class="bar" style="animation-delay: 0ms"></div>
+                        <div class="bar" style="animation-delay: 50ms"></div>
+                        <div class="bar" style="animation-delay: 100ms"></div>
+                        <div class="bar" style="animation-delay: 150ms"></div>
+                        <div class="bar" style="animation-delay: 200ms"></div>
+                        <div class="bar" style="animation-delay: 250ms"></div>
+                        <div class="bar" style="animation-delay: 300ms"></div>
+                        <div class="bar" style="animation-delay: 350ms"></div>
+                        <div class="bar" style="animation-delay: 400ms"></div>
+                        <div class="bar" style="animation-delay: 450ms"></div>
+                    </div>
+                </div>
+                <div class="player-controls">
+                    <button class="player-btn" id="prevTrack" title="Previous Track">⏮</button>
+                    <button class="player-btn" id="playPause" title="Play/Pause">▶</button>
+                    <button class="player-btn" id="nextTrack" title="Next Track">⏭</button>
+                    <button class="player-btn" id="shuffleBtn" title="Shuffle">🔀</button>
+                    <button class="player-btn" id="repeatBtn" title="Repeat">🔁</button>
+                </div>
+                <div class="volume-controls">
+                    <div class="volume-group">
+                        <label class="volume-label">🎵</label>
+                        <input type="range" id="musicVolume" class="volume-slider" min="0" max="100" value="30">
+                        <span class="volume-value" id="musicVolumeValue">30%</span>
+                        <button class="mute-btn" id="muteMusic" title="Mute Music">🔇</button>
+                    </div>
+                    <div class="volume-group">
+                        <label class="volume-label">🔊</label>
+                        <input type="range" id="sfxVolume" class="volume-slider" min="0" max="100" value="50">
+                        <span class="volume-value" id="sfxVolumeValue">50%</span>
+                        <button class="mute-btn" id="muteSFX" title="Mute SFX">🔇</button>
+                    </div>
+                </div>
+                <div class="track-list-toggle">
+                    <button id="trackListBtn" class="track-list-btn">📋 Playlist</button>
+                </div>
+            </div>
+            
+            <!-- Terminal Console -->
+            <div class="terminal-console">
+                <div class="terminal-header">
+                    <div class="terminal-title">
+                        <span class="terminal-icon">🖥️</span>
+                        <span>COSMIC DEFENSE TERMINAL</span>
+                    </div>
+                    <div class="terminal-controls">
+                        <button class="terminal-btn" id="clearTerminal" title="Clear Terminal">🗑️</button>
+                        <button class="terminal-btn" id="pauseTerminal" title="Pause Output">⏸️</button>
+                    </div>
+                </div>
+                <div class="terminal-output" id="terminalOutput">
+                    <div class="terminal-line system">[SYSTEM] Defense systems initialized...</div>
+                    <div class="terminal-line info">[INFO] Awaiting enemy contact...</div>
+                    <div class="terminal-line ready">[READY] All systems operational</div>
+                </div>
+                <div class="terminal-input">
+                    <span class="terminal-prompt">cosmic@defender:~$</span>
+                    <input type="text" class="terminal-command" id="terminalInput" placeholder="Enter command..." autocomplete="off">
+                </div>
+            </div>
         </div>
 
             <!-- Advanced HUD System -->
@@ -195,9 +268,121 @@
                                     <span id="gameTime" class="stat-value">0:00</span>
                                 </div>
                             </div>
+                            <div class="stat-item-compact">
+                                <span class="stat-icon">🎯</span>
+                                <div class="stat-details">
+                                    <span class="stat-label">Projectiles</span>
+                                    <span id="gameProjectilesFired" class="stat-value">0</span>
+                                </div>
+                            </div>
+                            <div class="stat-item-compact">
+                                <span class="stat-icon">📏</span>
+                                <div class="stat-details">
+                                    <span class="stat-label">Distance</span>
+                                    <span id="gameTotalDistance" class="stat-value">0u</span>
+                                </div>
+                            </div>
+                            <div class="stat-item-compact">
+                                <span class="stat-icon">🚫</span>
+                                <div class="stat-details">
+                                    <span class="stat-label">Escaped</span>
+                                    <span id="gameMobsEscaped" class="stat-value">0</span>
+                                </div>
+                            </div>
+                            <div class="stat-item-compact">
+                                <span class="stat-icon">🎖️</span>
+                                <div class="stat-details">
+                                    <span class="stat-label">Accuracy</span>
+                                    <span id="gameAccuracy" class="stat-value">100%</span>
+                                </div>
+                            </div>
+                            <div class="stat-item-compact">
+                                <span class="stat-icon">💰</span>
+                                <div class="stat-details">
+                                    <span class="stat-label">Earned</span>
+                                    <span id="gameResourcesEarned" class="stat-value">0</span>
+                                </div>
+                            </div>
+                            <div class="stat-item-compact">
+                                <span class="stat-icon">🚀</span>
+                                <div class="stat-details">
+                                    <span class="stat-label">Efficiency</span>
+                                    <span id="gameEfficiency" class="stat-value">0%</span>
+                                </div>
+                            </div>
                         </div>
+                </div>
+            </div>
+            
+            <!-- Track List Popup -->
+            <div id="trackListPopup" class="track-list-popup" style="display: none;">
+                <div class="track-list-header">
+                    <span>PLAYLIST</span>
+                    <button class="close-btn" id="closeTrackList">×</button>
+                </div>
+                <div class="track-list-content">
+                    <div class="track-item" data-track="0">
+                        <span class="track-num">01.</span>
+                        <span class="track-title">Cosmic Drift</span>
+                        <span class="track-genre">[ambient]</span>
+                    </div>
+                    <div class="track-item" data-track="1">
+                        <span class="track-num">02.</span>
+                        <span class="track-title">Nebula Dreams</span>
+                        <span class="track-genre">[ethereal]</span>
+                    </div>
+                    <div class="track-item" data-track="2">
+                        <span class="track-num">03.</span>
+                        <span class="track-title">Asteroid Belt</span>
+                        <span class="track-genre">[techno]</span>
+                    </div>
+                    <div class="track-item" data-track="3">
+                        <span class="track-num">04.</span>
+                        <span class="track-title">Solar Winds</span>
+                        <span class="track-genre">[chillwave]</span>
+                    </div>
+                    <div class="track-item" data-track="4">
+                        <span class="track-num">05.</span>
+                        <span class="track-title">Dark Matter</span>
+                        <span class="track-genre">[darkwave]</span>
+                    </div>
+                    <div class="track-item" data-track="5">
+                        <span class="track-num">06.</span>
+                        <span class="track-title">Plasma Storm</span>
+                        <span class="track-genre">[dnb]</span>
+                    </div>
+                    <div class="track-item" data-track="6">
+                        <span class="track-num">07.</span>
+                        <span class="track-title">Quantum Echo</span>
+                        <span class="track-genre">[glitch]</span>
+                    </div>
+                    <div class="track-item" data-track="7">
+                        <span class="track-num">08.</span>
+                        <span class="track-title">Gravity Well</span>
+                        <span class="track-genre">[dubstep]</span>
+                    </div>
+                    <div class="track-item" data-track="8">
+                        <span class="track-num">09.</span>
+                        <span class="track-title">Stellar Voyage</span>
+                        <span class="track-genre">[synthwave]</span>
+                    </div>
+                    <div class="track-item" data-track="9">
+                        <span class="track-num">10.</span>
+                        <span class="track-title">Ion Drive</span>
+                        <span class="track-genre">[industrial]</span>
+                    </div>
+                    <div class="track-item" data-track="10">
+                        <span class="track-num">11.</span>
+                        <span class="track-title">Warp Field</span>
+                        <span class="track-genre">[psytrance]</span>
+                    </div>
+                    <div class="track-item" data-track="11">
+                        <span class="track-num">12.</span>
+                        <span class="track-title">Zero Gravity</span>
+                        <span class="track-genre">[lofi]</span>
                     </div>
                 </div>
+            </div>
 
                 <!-- Enhanced Defense Panel -->
                 <div class="defense-panel-expanded">
@@ -301,126 +486,6 @@
                         <div class="stat-item">
                             <span class="stat-label">Crystals Harvested:</span>
                             <span id="crystalsHarvested" class="stat-value">0</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Music Player (Winamp Style) -->
-                    <div class="music-player">
-                        <div class="player-display">
-                            <div class="player-title">♪ COSMIC JUKEBOX ♪</div>
-                            <div class="track-info">
-                                <div class="track-number">TRACK <span id="trackNumber">01</span>/12</div>
-                                <div class="track-name" id="trackName">Cosmic Drift</div>
-                                <div class="track-time">
-                                    <span id="trackTime">0:00</span> / <span id="trackDuration">∞</span>
-                                </div>
-                            </div>
-                            <div class="visualizer">
-                                <div class="bar" style="animation-delay: 0ms"></div>
-                                <div class="bar" style="animation-delay: 50ms"></div>
-                                <div class="bar" style="animation-delay: 100ms"></div>
-                                <div class="bar" style="animation-delay: 150ms"></div>
-                                <div class="bar" style="animation-delay: 200ms"></div>
-                                <div class="bar" style="animation-delay: 250ms"></div>
-                                <div class="bar" style="animation-delay: 300ms"></div>
-                                <div class="bar" style="animation-delay: 350ms"></div>
-                                <div class="bar" style="animation-delay: 400ms"></div>
-                                <div class="bar" style="animation-delay: 450ms"></div>
-                            </div>
-                        </div>
-                        <div class="player-controls">
-                            <button class="player-btn" id="prevTrack" title="Previous Track">⏮</button>
-                            <button class="player-btn" id="playPause" title="Play/Pause">▶</button>
-                            <button class="player-btn" id="nextTrack" title="Next Track">⏭</button>
-                            <button class="player-btn" id="shuffleBtn" title="Shuffle">🔀</button>
-                            <button class="player-btn" id="repeatBtn" title="Repeat">🔁</button>
-                        </div>
-                        <div class="volume-controls">
-                            <div class="volume-group">
-                                <label class="volume-label">🎵</label>
-                                <input type="range" id="musicVolume" class="volume-slider" min="0" max="100" value="30">
-                                <span class="volume-value" id="musicVolumeValue">30%</span>
-                                <button class="mute-btn" id="muteMusic" title="Mute Music">🔇</button>
-                            </div>
-                            <div class="volume-group">
-                                <label class="volume-label">🔊</label>
-                                <input type="range" id="sfxVolume" class="volume-slider" min="0" max="100" value="50">
-                                <span class="volume-value" id="sfxVolumeValue">50%</span>
-                                <button class="mute-btn" id="muteSFX" title="Mute SFX">🔇</button>
-                            </div>
-                        </div>
-                        <div class="track-list-toggle">
-                            <button id="trackListBtn" class="track-list-btn">📋 Playlist</button>
-                        </div>
-                    </div>
-                    
-                    <!-- Track List Popup -->
-                    <div id="trackListPopup" class="track-list-popup" style="display: none;">
-                        <div class="track-list-header">
-                            <span>PLAYLIST</span>
-                            <button class="close-btn" id="closeTrackList">×</button>
-                        </div>
-                        <div class="track-list-content">
-                            <div class="track-item" data-track="0">
-                                <span class="track-num">01.</span>
-                                <span class="track-title">Cosmic Drift</span>
-                                <span class="track-genre">[ambient]</span>
-                            </div>
-                            <div class="track-item" data-track="1">
-                                <span class="track-num">02.</span>
-                                <span class="track-title">Nebula Dreams</span>
-                                <span class="track-genre">[ethereal]</span>
-                            </div>
-                            <div class="track-item" data-track="2">
-                                <span class="track-num">03.</span>
-                                <span class="track-title">Asteroid Belt</span>
-                                <span class="track-genre">[techno]</span>
-                            </div>
-                            <div class="track-item" data-track="3">
-                                <span class="track-num">04.</span>
-                                <span class="track-title">Solar Winds</span>
-                                <span class="track-genre">[chillwave]</span>
-                            </div>
-                            <div class="track-item" data-track="4">
-                                <span class="track-num">05.</span>
-                                <span class="track-title">Dark Matter</span>
-                                <span class="track-genre">[darkwave]</span>
-                            </div>
-                            <div class="track-item" data-track="5">
-                                <span class="track-num">06.</span>
-                                <span class="track-title">Plasma Storm</span>
-                                <span class="track-genre">[dnb]</span>
-                            </div>
-                            <div class="track-item" data-track="6">
-                                <span class="track-num">07.</span>
-                                <span class="track-title">Quantum Echo</span>
-                                <span class="track-genre">[glitch]</span>
-                            </div>
-                            <div class="track-item" data-track="7">
-                                <span class="track-num">08.</span>
-                                <span class="track-title">Gravity Well</span>
-                                <span class="track-genre">[dubstep]</span>
-                            </div>
-                            <div class="track-item" data-track="8">
-                                <span class="track-num">09.</span>
-                                <span class="track-title">Stellar Voyage</span>
-                                <span class="track-genre">[synthwave]</span>
-                            </div>
-                            <div class="track-item" data-track="9">
-                                <span class="track-num">10.</span>
-                                <span class="track-title">Ion Drive</span>
-                                <span class="track-genre">[industrial]</span>
-                            </div>
-                            <div class="track-item" data-track="10">
-                                <span class="track-num">11.</span>
-                                <span class="track-title">Warp Field</span>
-                                <span class="track-genre">[psytrance]</span>
-                            </div>
-                            <div class="track-item" data-track="11">
-                                <span class="track-num">12.</span>
-                                <span class="track-title">Zero Gravity</span>
-                                <span class="track-genre">[lofi]</span>
-                            </div>
                         </div>
                     </div>
                     
@@ -613,5 +678,7 @@
     <script src="stats-updater.js"></script>
     <script src="enhanced-ai.js"></script>
     <script src="debug-music.js"></script>
+    <script src="terminal-console.js"></script>
+    <script src="detailed-stats.js"></script>
 </body>
 </html>

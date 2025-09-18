@@ -1,10 +1,9 @@
 /* Music Player - Winamp Style */
 .music-player {
-    position: fixed;
-    bottom: 95px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 400px;
+    position: relative;
+    width: 100%;
+    max-width: calc(100vw - 680px);
+    margin: 0 auto 15px auto;
     background: linear-gradient(180deg, #2a2a3e 0%, #1a1a2e 100%);
     border: 2px solid #00ffff;
     border-radius: 8px;
@@ -212,18 +211,17 @@
 
 /* Track List Popup */
 .track-list-popup {
-    position: absolute;
-    bottom: 100%;
+    position: fixed;
+    bottom: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    margin-bottom: 10px;
+    transform: translate(-50%, 50%);
     width: 420px;
     max-height: 300px;
     background: linear-gradient(180deg, #2a2a3e 0%, #1a1a2e 100%);
     border: 2px solid #00ffff;
     border-radius: 8px;
     box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
-    z-index: 101;
+    z-index: 1001;
 }
 
 .track-list-header {

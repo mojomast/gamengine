@@ -2770,41 +2770,24 @@
         // Generate tower cards dynamically for unlocked towers
         updateTowerCards();
         
-        // Tower card click handlers
+        // Tower card click handlers for new compact layout
         function updateTowerCards() {
-            const towerGrid = document.querySelector('.tower-grid');
-            if (!towerGrid) return;
-            
-            towerGrid.innerHTML = '';
-            let cardIndex = 1;
-            
-            for (const [key, tower] of Object.entries(TowerTypes)) {
-                if (tower.unlocked) {
-                    const card = document.createElement('div');
-                    card.className = 'tower-card';
-                    card.dataset.tower = key;
-                    card.innerHTML = `
-                        <svg class="tower-preview" width="60" height="60">
-                            <circle cx="30" cy="30" r="15" fill="${tower.color}" stroke="${tower.color}" stroke-width="2" opacity="0.8"/>
-                            <text x="30" y="35" text-anchor="middle" fill="white" font-size="10">${cardIndex}</text>
-                        </svg>
-                        <div class="tower-info">
-                            <div class="tower-name">${tower.name.split(' ')[0]}</div>
-                            <div class="tower-cost">💎 ${tower.cost}</div>
-                        </div>
-                    `;
-                    
-                    card.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        console.log('Tower card clicked:', key);
-                        selectTowerType(key);
-                    });
-                    
-                    towerGrid.appendChild(card);
-                    cardIndex++;
-                    if (cardIndex > 10) break; // Limit display
-                }
+            const towerGrid = document.querySelector('.tower-grid-single');
+            if (!towerGrid) {
+                console.warn('Tower grid not found');
+                return;
             }
+            
+            // Add click handlers to existing tower cards
+            const towerCards = towerGrid.querySelectorAll('.tower-card-compact');
+            towerCards.forEach(card => {
+                card.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const towerType = card.dataset.tower;
+                    console.log('Tower card clicked:', towerType);
+                    selectTowerType(towerType);
+                });
+            });
         }
         
         window.updateTowerCards = updateTowerCards;
@@ -2836,16 +2819,7 @@
             }
         });
         
-        // Sound toggle (now controls SFX)
-        document.getElementById('soundToggle').addEventListener('click', () => {
-            const enabled = SoundManager.toggleSFX();
-            const btn = document.getElementById('soundToggle');
-            if (enabled) {
-                btn.classList.remove('muted');
-            } else {
-                btn.classList.add('muted');
-            }
-        });
+        // Sound toggle removed from UI
         
         // Skill tree toggle
         document.getElementById('skillTreeToggle').addEventListener('click', () => {
